@@ -7,7 +7,7 @@ from core import data_holders
 
 site = pywikibot.Site()
 
-def getRevertCount(edits):
+def getRevertCount(edits, older=None):
 	reverts = 0
 
 	for i in range(len(edits)):
@@ -23,13 +23,7 @@ def createEditList(page):
 	page = pywikibot.Page(site, page)
 
 	for rev in page.getVersionHistory():
-		print()
 		edit = data_holders.Edit(page.getOldVersion(rev[0]), rev[2], rev[0], rev[1])
 		edits.append(edit)
 
 	return edits
-
-def shouldProtect(page):
-	print(page)
-	edits = createEditList(page)
-	print(getRevertCount(edits))

@@ -15,4 +15,6 @@ class Executor:
 
 	def shouldProtect(self, page):
 		for rule in self.rules:
-			rule.run(page)
+			if rule.run(page):
+				return True
+		return False

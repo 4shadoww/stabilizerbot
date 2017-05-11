@@ -24,4 +24,4 @@ class Worker:
 
 		for rev in api.recentchanges(start=timeutc, end=oldtime):
 			if rev["user"] == "4shadoww":
-				self.r_exec.shouldProtect(rev["title"])
+				print(self.r_exec.shouldProtect(rev["title"]))
