@@ -5,7 +5,8 @@ class Edit:
 	revid = None
 	timestamp = None
 
-	def __init__(self, text, user, revid, timestamp):
+	def __init__(self, title, text, user, revid, timestamp):
+		self.title = title
 		self.text = text
 		self.user = user
 		self.revid = revid
