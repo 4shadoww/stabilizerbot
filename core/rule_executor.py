@@ -3,6 +3,7 @@ import importlib
 
 # Import core modules
 import core.config
+from core.log import *
 
 class Executor:
 
@@ -13,8 +14,7 @@ class Executor:
 			module = importlib.import_module("core.rules."+rule)
 			self.rules.append(module.YunoModule())
 
-	def shouldProtect(self, page):
+	def shouldProtect(self, title):
 		for rule in self.rules:
-			if rule.run(page):
-				return True
-		return False
+			printlog(rule.name, "on page:", title)
+			return rule.run(title)

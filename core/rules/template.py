@@ -2,5 +2,7 @@ from core.rule_core import *
 
 class YunoModule:
 
-	def run(self, page):
-		pass
+	name = "template"
+
+	def run(self, title):
+		return False
