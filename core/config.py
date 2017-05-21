@@ -1,3 +1,6 @@
+# Language
+lang = "fi"
+
 # Rules
 rules = ["anonreverts"]
 
