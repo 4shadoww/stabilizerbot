@@ -1,3 +1,6 @@
+# Import python modules
+import json
+from urllib.request import urlopen
 
 # Import core modules
 import core.config
@@ -19,4 +22,5 @@ class ORES:
 
 	def getScore(self, revids, models):
 		request_url = self.base_url+self.parameterMaker(self.revids_url, revids)+self.parameterMaker(self.models_url, models)
-		print(request_url)
+		
+		return json.load(urlopen(request_url))
