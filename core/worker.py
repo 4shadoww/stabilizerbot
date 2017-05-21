@@ -16,6 +16,8 @@ class Worker:
 	def __init__(self):
 		self. r_exec = rule_executor.Executor()
 
+	def checked(self, title):
+		
 
 	def run(self):
 		site = pywikibot.Site()
@@ -28,5 +30,5 @@ class Worker:
 
 		for rev in api.recentchanges(start=timeutc, end=oldtime, namespaces=[0]):
 			page = pywikibot.Page(site, rev["title"])
-			if page.exists():
+			if page.exists() and not self.checked(rev["title"]):
 				print(self.r_exec.shouldProtect(rev["title"]))

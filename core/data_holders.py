@@ -1,5 +1,6 @@
 
 class Edit:
+	title = None
 	text = None
 	user = None
 	revid = None
