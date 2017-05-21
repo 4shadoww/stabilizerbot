@@ -17,4 +17,8 @@ class Executor:
 	def shouldProtect(self, title):
 		for rule in self.rules:
 			printlog(rule.name, "on page:", title)
-			return rule.run(title)
+
+			if rule.run(title):
+				return True
+
+			return False
