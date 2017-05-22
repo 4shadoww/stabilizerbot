@@ -4,7 +4,7 @@ import time
 
 # Import pywikibot
 import pywikibot
-from pywikibot.site import APISite
+from pywikibot.pagegenerators import RepeatingGenerator
 
 # Import tinydb
 from tinydb import TinyDB, Query
@@ -18,6 +18,10 @@ class Worker:
 	site = pywikibot.Site()
 	db = TinyDB("db/revid.json")
 	rev = Query()
+
+	config = {
+		"sleep_duration": 5
+	}
 
 	def __init__(self):
 		self. r_exec = rule_executor.Executor()
@@ -39,13 +43,7 @@ class Worker:
 		return False
 
 	def run(self):
-		api = APISite("fi")
-		#timeutc = datetime.datetime(2017, 4, 21, 11, 20, 0, 0)
-		timeutc = datetime.datetime.utcnow()
-		#oldtime = datetime.datetime(2017, 4, 21, 11, 0, 0, 0)
-		oldtime = timeutc-datetime.timedelta(hours=12, minutes=0, seconds=0)
 
-		for rev in api.recentchanges(start=timeutc, end=oldtime, namespaces=[0]):
-			page = pywikibot.Page(self.site, rev["title"])
-			if page.exists() and not self.checked(rev["title"]):
-				print(self.r_exec.shouldProtect(rev["title"]))
+		for rev in RepeatingGenerator(self.site.recentchanges, lambda x: x['revid'], sleep_duration=self.config["sleep_duration"]):
+			#print(rev)
+			print(self.r_exec.shouldProtect(rev["revid"]))
