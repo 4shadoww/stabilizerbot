@@ -8,5 +8,5 @@ class YunoModule:
 
 	}
 
-	def run(self, title):
-		return False
+	def run(self, rev):
+		return 0
