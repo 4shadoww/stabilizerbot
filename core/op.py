@@ -11,15 +11,15 @@ from core import data_holders
 
 site = pywikibot.Site()
 
-def getRevertList(edits, inf = False, older_hours = 40, older_minutes = 0, older_seconds = 0):
+def getRevertList(edits, inf = False, end_hours = 3, end_minutes = 0, end_seconds = 0):
 	reverts = []
 
-	older = datetime.timedelta(hours=older_hours, minutes=older_minutes, seconds=older_seconds)
+	end = datetime.timedelta(hours=end_hours, minutes=end_minutes, seconds=end_seconds)
 
 	timeutc = datetime.datetime.utcnow()
 
 	for i in range(len(edits)):
-		if edits[i].timestamp < timeutc-older and not inf:
+		if edits[i].timestamp < timeutc-end and not inf:
 			break
 
 		for x in range(i+1, len(edits)):
@@ -29,16 +29,16 @@ def getRevertList(edits, inf = False, older_hours = 40, older_minutes = 0, older
 				break
 	return reverts
 
-def createEditList(title, inf = False, older_hours = 40, older_minutes = 0, older_seconds = 0):
+def createEditList(title, inf = False, end_hours = 3, end_minutes = 0, end_seconds = 0):
 	edits = []
 
-	older = datetime.timedelta(hours=older_hours, minutes=older_minutes, seconds=older_seconds)
+	end = datetime.timedelta(hours=end_hours, minutes=end_minutes, seconds=end_seconds)
 	timeutc = datetime.datetime.utcnow()
 
 	page = pywikibot.Page(site, title)
 
 	for rev in page.getVersionHistory():
-		if rev[1] < timeutc-older and not inf:
+		if rev[1] < timeutc-end and not inf:
 			break
 		edit = data_holders.Edit(title, page.getOldVersion(rev[0]), rev[2], rev[0], rev[1])
 		edits.append(edit)

@@ -9,10 +9,10 @@ class YunoModule:
 		"reverts_required": 1,
 	}
 
-	def run(self, title):
+	def run(self, rev):
 		site = pywikibot.Site()
-		edits = op.createEditList(title)
-		reverts = op.getRevertList(edits)
+		edits = op.createEditList(rev["title"], end_hours=self.config["hours"])
+		reverts = op.getRevertList(edits, end_hours=self.config["hours"])
 
 		ip_reverts = 0
 

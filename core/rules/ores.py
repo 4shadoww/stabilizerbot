@@ -2,7 +2,7 @@ from core.rule_core import *
 
 class YunoModule:
 
-	name = "template"
+	name = "ores"
 
 	config = {
 

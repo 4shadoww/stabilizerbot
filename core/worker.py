@@ -10,8 +10,8 @@ from pywikibot.pagegenerators import RepeatingGenerator
 from tinydb import TinyDB, Query
 
 # Import core modules
-from core import op
 from core import rule_executor
+from core import mwapi
 
 class Worker:
 	r_exec = None
@@ -25,6 +25,14 @@ class Worker:
 
 	def __init__(self):
 		self. r_exec = rule_executor.Executor()
+
+	def shouldCheck(self, revid):
+		api = mwapi.MWAPI()
+		rev = api.getRevision([revid])
+		if "badrevids" in rev["query"]:
+			return False
+
+		return True
 
 	def checked(self, title):
 		result = self.db.search(self.rev.title == title)
@@ -44,6 +52,6 @@ class Worker:
 
 	def run(self):
 
-		for rev in RepeatingGenerator(self.site.recentchanges, lambda x: x['revid'], sleep_duration=self.config["sleep_duration"]):
-			#print(rev)
-			print(self.r_exec.shouldProtect(rev["revid"]))
+		for rev in RepeatingGenerator(self.site.recentchanges, lambda x: x['revid'], sleep_duration=self.config["sleep_duration"], namespaces=0):
+			if self.shouldCheck(rev["revid"]):
+				print(self.r_exec.shouldStabilize(rev))
