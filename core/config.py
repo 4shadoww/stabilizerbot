@@ -2,7 +2,7 @@
 lang = "fi"
 
 # Rules
-rules = ["anonreverts"]
+rules = ["anonreverts", "ores"]
 
 # Ignored rules
 ign_rules = []

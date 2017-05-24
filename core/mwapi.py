@@ -24,7 +24,7 @@ class ORES:
 	models_url = "&models="
 
 
-	def getScore(self, revids, models):
+	def getScore(self, revids, models=["reverted", "goodfaith", "damaging"]):
 		request_url = self.base_url+parameterMaker(self.revids_url, revids)+parameterMaker(self.models_url, models)
 
 		return json.load(urlopen(request_url))

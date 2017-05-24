@@ -6,7 +6,7 @@ class YunoModule:
 
 	config = {
 		"hours": 1,
-		"reverts_required": 1,
+		"reverts_required": 2,
 	}
 
 	def run(self, rev):
