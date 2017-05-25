@@ -1,15 +1,19 @@
 # Import python modules
 import datetime
 import time
+import json
+from sseclient import SSEClient as EventSource
 
 # Import pywikibot
 import pywikibot
+from pywikibot.site import APISite
 from pywikibot.pagegenerators import RepeatingGenerator
 
 # Import tinydb
 from tinydb import TinyDB, Query
 
 # Import core modules
+import core.config
 from core import rule_executor
 from core import mwapi
 
@@ -20,7 +24,8 @@ class Worker:
 	rev = Query()
 
 	config = {
-		"sleep_duration": 5
+		"sleep_duration": 5,
+		"namespaces": [0]
 	}
 
 	def __init__(self):
@@ -51,7 +56,14 @@ class Worker:
 		return False
 
 	def run(self):
+		wiki = core.config.lang+"wiki"
+		for event in EventSource(core.config.stream_url):
+			if event.event == 'message':
+				try:
+					change = json.loads(event.data)
+				except ValueError:
+					continue
 
-		for rev in RepeatingGenerator(self.site.recentchanges, lambda x: x['revid'], sleep_duration=self.config["sleep_duration"], namespaces=0):
-			if self.shouldCheck(rev["revid"]):
-				print(self.r_exec.shouldStabilize(rev))
+				if change["wiki"] == wiki and change["type"] == "edit" and change["namespace"] in self.config.namespaces:
+					if self.shouldCheck(change["revision"]["new"]):
+						print(self.r_exec.shouldStabilize(change))

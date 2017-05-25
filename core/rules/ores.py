@@ -8,28 +8,32 @@ class YunoModule:
 	ores_api = mwapi.ORES()
 
 	config = {
-	0: {
-	"models": {
-		"damaging": {"max_false": 0.15, "min_true": 0.8},
-		"goodfaith": {"min_false": 0.8, "max_true": 0.15},
-		"reverted": {"max_false": 0.15, "min_true": 0.8},
-	},
-	"score": 1},
-
-	1: {
-	"models": {
-		"damaging": {"max_false": 0.1, "min_true": 0.9},
-		"goodfaith": {"min_false": 0.9, "max_true": 0.1},
-		"reverted": {"max_false": 0.1, "min_true": 0.9},
-	},
-	"score": 2}
-
+		"0": {
+			"models": {
+				"damaging": {"max_false": 0.15, "min_true": 0.8},
+				"goodfaith": {"min_false": 0.8, "max_true": 0.15},
+				"reverted": {"max_false": 0.15, "min_true": 0.8}
+			},
+			"score": 1
+		},
+		"1": {
+			"models": {
+				"damaging": {"max_false": 0.1, "min_true": 0.9},
+				"goodfaith": {"min_false": 0.9, "max_true": 0.1},
+				"reverted": {"max_false": 0.1, "min_true": 0.9}
+			},
+			"score": 2
+		}
 	}
 
-	def run(self, rev):
-		scores = self.ores_api.getScore([rev["revid"]])
+	def load_config(self):
+		if core.config.config_mode == "online":
+			pass
 
-		revid_data = scores[str(rev["revid"])]
+	def run(self, rev):
+		scores = self.ores_api.getScore([rev["revision"]["new"]])
+
+		revid_data = scores[str(rev["revision"]["new"])]
 
 		score = 0
 

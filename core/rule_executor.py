@@ -1,5 +1,6 @@
 # Import python modules
 import importlib
+import traceback
 
 # Import core modules
 import core.config
@@ -14,20 +15,24 @@ class Executor:
 
 	def __init__(self):
 		for rule in core.config.rules:
-			module = importlib.import_module("core.rules."+rule)
-			self.rules.append(module.YunoModule())
+			if rule not in core.config.ign_rules:
+				module = importlib.import_module("core.rules."+rule)
+				self.rules.append(module.YunoModule())
 
 	def shouldStabilize(self, rev):
 		overall_score = 0
 
 		for rule in self.rules:
-			score = rule.run(rev)
-			printlog(rule.name, "on page:", rev["title"],  "score:", score)
+			try:
+				score = rule.run(rev)
+				printlog(rule.name, "on page:", rev["title"],  "score:", score)
 
-			if score < 0:
-				return False
+				if score < 0:
+					return False
 
-			score += overall_score
+				overall_score += score
+			except:
+				crashreport(traceback.format_exc())
 
 		if overall_score >= self.config["required_score"]:
 			return True

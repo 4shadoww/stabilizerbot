@@ -7,6 +7,7 @@ class YunoModule:
 	config = {
 		"hours": 1,
 		"reverts_required": 2,
+		"score": 1,
 	}
 
 	def run(self, rev):
@@ -17,14 +18,14 @@ class YunoModule:
 		ip_reverts = 0
 
 		if len(reverts) >= self.config["reverts_required"]:
-			for rev in reverts:
-				reverter = pywikibot.User(site, title=rev["reverter"])
-				victim = pywikibot.User(site, title=rev["victim"])
+			for revert in reverts:
+				reverter = pywikibot.User(site, title=revert["reverter"])
+				victim = pywikibot.User(site, title=revert["victim"])
 
 				if "autoconfirmed" not in victim.groups() or "autoconfirmed" not in reverter.groups():
 					ip_reverts += 1
 
 		if ip_reverts >= self.config["reverts_required"]:
-			return 1
+			return self.config["score"]
 
 		return 0
