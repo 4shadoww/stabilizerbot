@@ -2,7 +2,8 @@ from core.rule_core import *
 
 class YunoModule:
 
-	name = "annonreverts"
+	name = "anonreverts"
+	cfg_ver = None
 
 	config = {
 		"hours": 1,

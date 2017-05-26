@@ -5,6 +5,7 @@ import datetime
 class YunoModule:
 
 	name = "abusefilters"
+	cfg_ver = None
 
 	config = {
 		"filters": [11, 30, 34, 38, 55, 58, 98, 133],

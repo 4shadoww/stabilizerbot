@@ -1,14 +1,14 @@
 import datetime
-from core import config
 from core import colors
 import sys
+from core import config_loader
 
 log_time = datetime.datetime.now()
 log_logfilename = str(log_time)
-if config.enable_log:
+if config_loader.core_config["enable_log"]:
 	logfile = open('core/log/'+log_logfilename+'.log', 'a')
 
-if config.log_warnings:
+if config_loader.core_config["log_warnings"]:
 	warfile = open('core/log/warnings.log', 'a')
 
 def printlog(*message, end='\n'):
@@ -20,7 +20,7 @@ def printlog(*message, end='\n'):
 
 	log_time = datetime.datetime.now()
 	line = str(log_time)+' '+finalmessage+end
-	if config.enable_log == True:
+	if config_loader.core_config["enable_log"]:
 		logfile.write(line)
 	sys.stdout.write(line)
 
@@ -31,7 +31,7 @@ def log(*message, end='\n'):
 		if l != len(message):
 			finalmessage += " "
 
-	if config.enable_log == True:
+	if config_loader.core_config["enable_log"]:
 		log_time = datetime.datetime.now()
 		line = str(log_time)+' '+finalmessage+end
 		logfile.write(line)
@@ -46,7 +46,7 @@ def debug(*message, end='\n'):
 
 	sys.stdout.write(finalmessage+end)
 	log(finalmessage)
-	
+
 def crashreport(*message):
 	crashfile = open('core/log/crashreport.log', 'a')
 	finalmessage = ""

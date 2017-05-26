@@ -4,6 +4,7 @@ from core import mwapi
 class YunoModule:
 
 	name = "ores"
+	cfg_ver = None
 
 	ores_api = mwapi.ORES()
 
