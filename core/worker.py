@@ -5,14 +5,6 @@ import json
 from sseclient import SSEClient as EventSource
 from threading import Thread
 
-# Import pywikibot
-import pywikibot
-from pywikibot.site import APISite
-from pywikibot.pagegenerators import RepeatingGenerator
-
-# Import tinydb
-#from tinydb import TinyDB, Query
-
 # Import core modules
 from core import config_loader
 from core import rule_executor
@@ -47,9 +39,6 @@ class ConfigUpdate(Thread):
 
 class Worker:
 	r_exec = None
-	site = pywikibot.Site()
-	#db = TinyDB("db/revid.json")
-	#rev = Query()
 	killer = None
 	cf_updater = None
 
@@ -68,22 +57,6 @@ class Worker:
 			return False
 
 		return True
-
-	def checked(self, title):
-		result = self.db.search(self.rev.title == title)
-		page = pywikibot.Page(self.site, title)
-		latestrev = page.latestRevision()
-
-		if len(result) > 0 and result[0]["revid"] == latestrev:
-			return True
-
-		# Update database
-		if len(result) > 0:
-			self.db.update({"revid": latestrev}, self.rev.title == title)
-		else:
-			self.db.insert({"title": title, "revid": latestrev})
-
-		return False
 
 	def run(self):
 		try:

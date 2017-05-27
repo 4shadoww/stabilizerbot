@@ -23,7 +23,7 @@ def checkForUpdate():
 	global cfg_ver
 	global online_config
 	global core_config
-	
+
 	page = pywikibot.Page(site, core_config["online_conf_path"])
 
 	if not page.exists():
@@ -38,7 +38,3 @@ def checkForUpdate():
 		# Update core config
 		updateConfig(core_config, online_config["core"])
 		printlog("new config loaded to core")
-
-def send2Core():
-	for item in online_config["core"]:
-		pass

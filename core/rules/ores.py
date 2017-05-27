@@ -8,24 +8,22 @@ class YunoModule:
 
 	ores_api = mwapi.ORES()
 
-	config = {
-		"0": {
+	config = [
+		{
 			"models": {
 				"damaging": {"max_false": 0.15, "min_true": 0.8},
-				"goodfaith": {"min_false": 0.8, "max_true": 0.15},
-				"reverted": {"max_false": 0.15, "min_true": 0.8}
+				"goodfaith": {"min_false": 0.8, "max_true": 0.15}
 			},
 			"score": 1
 		},
-		"1": {
+		{
 			"models": {
 				"damaging": {"max_false": 0.1, "min_true": 0.9},
-				"goodfaith": {"min_false": 0.9, "max_true": 0.1},
-				"reverted": {"max_false": 0.1, "min_true": 0.9}
+				"goodfaith": {"min_false": 0.9, "max_true": 0.1}
 			},
 			"score": 2
 		}
-	}
+	]
 
 	def load_config(self):
 		if core.config.config_mode == "online":
@@ -41,25 +39,25 @@ class YunoModule:
 		for rule in self.config:
 			failed = False
 
-			for item in self.config[rule]["models"]:
+			for item in rule["models"]:
 				if failed:
 					break
 
-				for value in self.config[rule]["models"][item]:
-					if value == "max_false" and self.config[rule]["models"][item][value] < revid_data[item]["probability"]["false"]:
+				for value in rule["models"][item]:
+					if value == "max_false" and rule["models"][item][value] < revid_data[item]["probability"]["false"]:
 						failed = True
 						break
-					elif value == "min_false" and self.config[rule]["models"][item][value] > revid_data[item]["probability"]["false"]:
+					elif value == "min_false" and rule["models"][item][value] > revid_data[item]["probability"]["false"]:
 						failed = True
 						break
-					elif value == "max_true" and self.config[rule]["models"][item][value] < revid_data[item]["probability"]["true"]:
+					elif value == "max_true" and rule["models"][item][value] < revid_data[item]["probability"]["true"]:
 						failed = True
 						break
-					elif value == "min_true" and self.config[rule]["models"][item][value] > revid_data[item]["probability"]["true"]:
+					elif value == "min_true" and rule["models"][item][value] > revid_data[item]["probability"]["true"]:
 						failed = True
 						break
 
-			if not failed and self.config[rule]["score"] > score:
-				score = self.config[rule]["score"]
+			if not failed and rule["score"] > score:
+				score = rule["score"]
 
 		return score

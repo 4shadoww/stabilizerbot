@@ -8,18 +8,18 @@ class YunoModule:
 	cfg_ver = None
 
 	config = {
-		"filters": [11, 30, 34, 38, 55, 58, 98, 133],
+		"filters": [11, 30, 34, 38, 55, 58, 98, 133, 124, 125, 126],
 		"hours": 1,
-		"rules": {
-			"0": {
+		"rules": [
+			{
 				"hits": 1,
 				"score": 1
 			},
-			"1": {
+			{
 				"hits": 5,
 				"score": 2
 			}
-		}
+		]
 	}
 
 	api = mwapi.MWAPI()
@@ -36,8 +36,8 @@ class YunoModule:
 		result = self.api.getAbuseFiler(rev["user"], time, self.config["filters"])
 
 		for rule in self.config["rules"]:
-			if self.config["rules"][rule]["hits"] <= len(result["query"]["abuselog"]):
-				if score < self.config["rules"][rule]["score"]:
-					score = self.config["rules"][rule]["score"]
+			if rule["hits"] <= len(result["query"]["abuselog"]):
+				if score < rule["score"]:
+					score = rule["score"]
 
 		return score
