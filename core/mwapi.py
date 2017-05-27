@@ -26,8 +26,12 @@ class ORES:
 
 	def getScore(self, revids, models=["reverted", "goodfaith", "damaging"]):
 		request_url = self.base_url+parameterMaker(self.revids_url, revids)+parameterMaker(self.models_url, models)
-
-		return json.load(urlopen(request_url))
+		request = urlopen(request_url)
+		try:
+			request = request.read().decode('utf8')
+		except AttributeError:
+			pass
+		return json.loads(request)
 
 class MWAPI:
 
