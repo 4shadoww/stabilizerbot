@@ -1,9 +1,9 @@
 user-config.py
 __pycache__/
 apicache/
-
+core/logs/
 throttle.ctrl
 pywikibot.lwp
-
+logs/
 db/
 test.py
