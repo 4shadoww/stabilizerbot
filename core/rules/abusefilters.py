@@ -8,7 +8,7 @@ class YunoModule:
 	cfg_ver = None
 
 	config = {
-		"filters": [11, 30, 34, 38, 55, 58, 98, 133, 124, 125, 126],
+		"filters": [11, 30, 34, 38, 55, 58, 98, 125, 133],
 		"hours": 1,
 		"rules": [
 			{
@@ -34,6 +34,10 @@ class YunoModule:
 		time = time.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 		result = self.api.getAbuseFiler(rev["user"], time, self.config["filters"])
+
+		if "error" in result:
+			printlog("abusefilters error:",result["error"]["code"])
+			return score
 
 		for rule in self.config["rules"]:
 			if rule["hits"] <= len(result["query"]["abuselog"]):
