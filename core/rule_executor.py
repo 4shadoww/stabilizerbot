@@ -51,4 +51,7 @@ class Executor:
 				logdecision(rev["title"], rev["revision"]["new"], rev["user"])
 			return True
 
+		if config_loader.core_config["log_decision"] == "negative" or config_loader.core_config["log_decision"] == "both":
+			logdecision(rev["title"], rev["revision"]["new"], rev["user"])
+
 		return False

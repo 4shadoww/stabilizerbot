@@ -3,8 +3,14 @@
 # Import python modules
 import sys
 
+# Import path tool
+from core import path
+
 # Append lib path
-sys.path.append("core/lib/")
+sys.path.append(path.main()+"core/lib/")
+
+# Set pywikibot config path
+os.environ["PYWIKIBOT2_DIR"] = path.main()
 
 # Import core modules
 from core import worker

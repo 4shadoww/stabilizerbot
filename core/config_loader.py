@@ -1,11 +1,14 @@
 # Import python modules
 import json
 
+# Import core modules
+from core import path
+
 # Import pywikibot
 import pywikibot
 
 # Local config file
-core_config_f = open("core/config.json", "r")
+core_config_f = open(path.main()+"core/config.json", "r")
 core_config = json.load(core_config_f)
 
 # Import core modules

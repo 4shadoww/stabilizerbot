@@ -1,15 +1,15 @@
 import datetime
-from core import colors
 import sys
+from core import path
 from core.config_loader import core_config
 
 log_time = datetime.datetime.now()
 log_logfilename = str(log_time)
 if core_config["enable_log"]:
-	logfile = open("core/logs/"+log_logfilename+".log", "a")
+	logfile = open(path.main()+"core/logs/"+log_logfilename+".log", "a")
 
 if core_config["log_warnings"]:
-	warfile = open("core/logs/warnings.log", "a")
+	warfile = open(path.main()+"core/logs/warnings.log", "a")
 
 def printlog(*message, end="\n"):
 	finalmessage = ""
@@ -48,7 +48,7 @@ def debug(*message, end="\n"):
 	log(finalmessage)
 
 def crashreport(*message):
-	crashfile = open("core/logs/crashreport.log", "a")
+	crashfile = open(path.main()+"core/logs/crashreport.log", "a")
 	finalmessage = ""
 	for l, mes in enumerate(message):
 		finalmessage += str(mes)
@@ -61,7 +61,7 @@ def crashreport(*message):
 	crashfile.close()
 
 def logdecision(*message):
-	decfile = open("core/logs/decision.log", "a")
+	decfile = open(path.main()+"core/logs/decision.log", "a")
 	finalmessage = ""
 	for l, mes in enumerate(message):
 		finalmessage += str(mes)
