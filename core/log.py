@@ -68,5 +68,5 @@ def logdecision(*message):
 		if l != len(message):
 			finalmessage += " "
 	decfile.flush()
-	decfile.write(finalmessage)
+	decfile.write(finalmessage+"\n")
 	decfile.close()
