@@ -2,6 +2,7 @@
 
 # Import python modules
 import sys
+import os
 
 # Import path tool
 from core import path

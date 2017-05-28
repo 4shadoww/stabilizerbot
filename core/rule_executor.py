@@ -28,6 +28,8 @@ class Executor:
 	def shouldStabilize(self, rev):
 		overall_score = 0
 		self.loadRules()
+		scores = {}
+
 		for rule in self.rules:
 			try:
 				if config_loader.core_config["config_mode"] == "online" and rule.cfg_ver != config_loader.cfg_ver:
@@ -36,6 +38,7 @@ class Executor:
 					rule.cfg_ver = config_loader.cfg_ver
 
 				score = rule.run(rev)
+				scores[rule.name] = score
 				printlog(rule.name, "on page:", rev["title"],  "score:", score)
 
 				if score < 0:
@@ -43,15 +46,16 @@ class Executor:
 
 				overall_score += score
 			except:
+				scores[rule.name] = 0
 				printlog("unexcepted error on", rule.name, "check crasreport")
 				crashreport(traceback.format_exc())
 
 		if overall_score >= config_loader.core_config["required_score"]:
 			if config_loader.core_config["log_decision"] == "positive" or config_loader.core_config["log_decision"] == "both":
-				logdecision(rev["title"], rev["revision"]["new"], rev["user"])
+				logdecision(rev["title"], rev["revision"]["new"], rev["user"], str(scores))
 			return True
 
 		if config_loader.core_config["log_decision"] == "negative" or config_loader.core_config["log_decision"] == "both":
-			logdecision(rev["title"], rev["revision"]["new"], rev["user"])
+			logdecision(rev["title"], rev["revision"]["new"], rev["user"], str(scores))
 
 		return False
