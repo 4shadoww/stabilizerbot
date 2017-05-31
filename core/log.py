@@ -2,6 +2,7 @@ import datetime
 import sys
 from core import path
 from core.config_loader import core_config
+import json
 
 log_time = datetime.datetime.now()
 log_logfilename = str(log_time)
@@ -60,13 +61,10 @@ def crashreport(*message):
 	crashfile.write(line)
 	crashfile.close()
 
-def logdecision(*message):
+def logdecision(title, revid, user, timestamp, scores):
 	decfile = open(path.main()+"logs/decision.log", "a")
-	finalmessage = ""
-	for l, mes in enumerate(message):
-		finalmessage += str(mes)
-		if l != len(message):
-			finalmessage += " "
+	finalmessage = "{\"title\": "+"\""+title+"\", "+"\"revid\": "+str(revid)+", "+"\"user\": "+"\""+user+"\", "+"\"timestamp\": "+"\""+str(timestamp)+"\", "+"\"scores\": "+json.dumps(scores)+"}"
+
 	decfile.flush()
 	decfile.write(finalmessage+"\n")
 	decfile.close()

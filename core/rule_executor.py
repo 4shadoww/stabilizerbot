@@ -52,10 +52,10 @@ class Executor:
 
 		if overall_score >= config_loader.core_config["required_score"]:
 			if config_loader.core_config["log_decision"] == "positive" or config_loader.core_config["log_decision"] == "both":
-				logdecision(rev["title"], rev["revision"]["new"], rev["user"], str(scores))
+				logdecision(rev["title"], rev["revision"]["new"], rev["user"], rev["timestamp"], scores)
 			return True
 
 		if config_loader.core_config["log_decision"] == "negative" or config_loader.core_config["log_decision"] == "both":
-			logdecision(rev["title"], rev["revision"]["new"], rev["user"], str(scores))
+			logdecision(rev["title"], rev["revision"]["new"], rev["user"], rev["timestamp"], scores)
 
 		return False

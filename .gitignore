@@ -5,3 +5,4 @@ __pycache__/
 /pywikibot.lwp
 /logs/*
 test.py
+readme.md
