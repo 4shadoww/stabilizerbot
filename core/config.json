@@ -9,6 +9,6 @@
 	"online_conf_path": "Käyttäjä:4shadowwBOT/config.json",
 	"enable_log": false,
 	"log_warnings": false,
-	"log_decision": "both"
+	"log_decision": "positive"
 
 }
