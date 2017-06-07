@@ -44,6 +44,9 @@ class YunoModule:
 					break
 
 				for value in rule["models"][item]:
+					if "probability" not in revid_data[item]:
+						crashreport(revid_data)
+
 					if value == "max_false" and rule["models"][item][value] < revid_data[item]["probability"]["false"]:
 						failed = True
 						break
