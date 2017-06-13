@@ -27,8 +27,9 @@ class YunoModule:
 					reverter = pywikibot.User(site, title=revert["reverter"])
 					victim = pywikibot.User(site, title=revert["victim"])
 
-					if all(i not in victim.groups() for i in rule["groups"]) or  all(i not in reverter.groups() for i in rule["groups"]):
-						ip_reverts += 1
+					if revert["reverter"] != revert["victim"]:
+						if all(i not in victim.groups() for i in rule["groups"]) or  all(i not in reverter.groups() for i in rule["groups"]):
+							ip_reverts += 1
 
 		if ip_reverts >= rule["reverts_required"]:
 			return rule["score"]
