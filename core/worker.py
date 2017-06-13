@@ -11,9 +11,11 @@ from core import rule_executor
 from core import mwapi
 from core.log import *
 
+# Object that sends kill signal to ConfigUpdater thread
 class Killer:
 	kill = False
 
+# Updates config when changed every 30 seconds
 class ConfigUpdate(Thread):
 
 	killer = None
@@ -23,13 +25,22 @@ class ConfigUpdate(Thread):
 		super(ConfigUpdate, self).__init__()
 
 	def run(self):
-		times = 60
+		if config_loader.current_config["core"]["config_mode"] == "online":
+			printlog("online config mode enabled")
+		else:
+			printlog("local config mode enabled")
+
+		uf = 30
+		times = uf
 		while True:
 			if self.killer.kill:
 				return
-			if times >= 60:
+			if times >= uf:
 				times = 0
-				config_loader.checkForUpdate()
+				if config_loader.current_config["core"]["config_mode"] == "online":
+					config_loader.checkForOnlineUpdate()
+				else:
+					config_loader.checkForLocalUpdate()
 
 			if self.killer.kill:
 				return
@@ -44,13 +55,13 @@ class Worker:
 
 	def __init__(self):
 		self.r_exec = rule_executor.Executor()
-		if config_loader.core_config["config_mode"] == "online":
-			printlog("online mode enabled")
-			self.killer = Killer()
-			self.cf_updater = ConfigUpdate(self.killer)
-			self.cf_updater.start()
+		# Init ConfigUpdater
+		self.killer = Killer()
+		self.cf_updater = ConfigUpdate(self.killer)
+		self.cf_updater.start()
 
 	def shouldCheck(self, revid):
+		# Check should revision to be checked at all
 		api = mwapi.MWAPI()
 		rev = api.getRevision([revid])
 		if "badrevids" in rev["query"]:
@@ -60,19 +71,21 @@ class Worker:
 
 	def run(self):
 		try:
-			wiki = config_loader.core_config["lang"]+"wiki"
-			for event in EventSource(config_loader.core_config["stream_url"]):
+			wiki = config_loader.current_config["core"]["lang"]+"wiki"
+			# Event stream
+			for event in EventSource(config_loader.current_config["core"]["stream_url"]):
+				# Filter event stream
 				if event.event == 'message':
 					try:
 						change = json.loads(event.data)
 					except ValueError:
 						continue
 
-					if change["wiki"] == wiki and change["type"] == "edit" and change["namespace"] in config_loader.core_config["namespaces"]:
+					if change["wiki"] == wiki and change["type"] == "edit" and change["namespace"] in config_loader.current_config["core"]["namespaces"]:
+						# Check should revision to be checked at all
 						if self.shouldCheck(change["revision"]["new"]):
 							print(self.r_exec.shouldStabilize(change))
 		except KeyboardInterrupt:
 			print("terminating yuno...")
-			if config_loader.core_config["config_mode"] == "online":
-				self.killer.kill = True
-				self.cf_updater.join()
+			self.killer.kill = True
+			self.cf_updater.join()

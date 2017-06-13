@@ -1,0 +1,54 @@
+{
+	"anonreverts": [
+			{
+					"hours": 1,
+					"reverts_required": 2,
+					"score": 1,
+					"groups": [
+							"autoconfirmed"
+					]
+			}
+	],
+	"ores": [
+			{
+					"models": {
+							"damaging": {
+									"max_false": 0.15,
+									"min_true": 0.8
+							},
+							"goodfaith": {
+									"min_false": 0.8,
+									"max_true": 0.15
+							}
+					},
+					"score": 1
+			}
+	],
+	"abusefilters": {
+			"filters": [
+					11,
+					30,
+					34,
+					38,
+					55,
+					58,
+					98,
+					125,
+					133
+			],
+			"hours": 1,
+			"rules": [
+					{
+							"hits": 1,
+							"score": 1
+					},
+					{
+							"hits": 4,
+							"score": 2
+					}
+			]
+	},
+	"greylist": {
+			"list_path": "Käyttäjä:4shadowwBOT/greylist.json"
+	}
+}

@@ -1,15 +1,15 @@
 import datetime
 import sys
 from core import path
-from core.config_loader import core_config
+from core.config_loader import current_config
 import json
 
 log_time = datetime.datetime.now()
 log_logfilename = str(log_time)
-if core_config["enable_log"]:
+if current_config["core"]["enable_log"]:
 	logfile = open(path.main()+"logs/"+log_logfilename+".log", "a")
 
-if core_config["log_warnings"]:
+if current_config["core"]["log_warnings"]:
 	warfile = open(path.main()+"logs/warnings.log", "a")
 
 def printlog(*message, end="\n"):
@@ -21,7 +21,7 @@ def printlog(*message, end="\n"):
 
 	log_time = datetime.datetime.now()
 	line = str(log_time)+" "+finalmessage+end
-	if core_config["enable_log"]:
+	if current_config["core"]["enable_log"]:
 		logfile.write(line)
 	sys.stdout.write(line)
 
@@ -32,11 +32,10 @@ def log(*message, end="\n"):
 		if l != len(message):
 			finalmessage += " "
 
-	if core_config["enable_log"]:
+	if current_config["core"]["enable_log"]:
 		log_time = datetime.datetime.now()
 		line = str(log_time)+" "+finalmessage+end
 		logfile.write(line)
-
 
 def debug(*message, end="\n"):
 	finalmessage = ""

@@ -7,6 +7,8 @@ import pywikibot
 
 site = pywikibot.Site()
 
+# Get reverts from article
+# Used with tumple that createEditList returns
 def getRevertList(edits, inf = False, end_hours = 3, end_minutes = 0, end_seconds = 0):
 	reverts = []
 
@@ -25,6 +27,7 @@ def getRevertList(edits, inf = False, end_hours = 3, end_minutes = 0, end_second
 				break
 	return reverts
 
+# Create edit history from article
 def createEditList(title, inf = False, end_hours = 3, end_minutes = 0, end_seconds = 0):
 	edits = []
 

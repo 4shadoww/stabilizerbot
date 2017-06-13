@@ -29,12 +29,32 @@ class YunoModule:
 		if core.config.config_mode == "online":
 			pass
 
+	def getScores(self, rev):
+		tries = 2
+		revid_data = 1
+		# Check result and check for errors
+		# If error faced then try again once
+		for i in reversed(range(tries)):
+			scores = self.ores_api.getScore([rev["revision"]["new"]])
+			revid_data = scores[str(rev["revision"]["new"])]
+
+			for item in revid_data:
+				if "error" in revid_data[item] and "probability" not in revid_data[item]:
+					if i <= 0:
+						printlog("error: failed to fetch ores revision data:", revid_data)
+						return 1
+				else:
+					break
+
+		return revid_data
+
 	def run(self, rev):
-		scores = self.ores_api.getScore([rev["revision"]["new"]])
-
-		revid_data = scores[str(rev["revision"]["new"])]
-
 		score = 0
+
+		revid_data = self.getScores(rev)
+
+		if revid_data == 1:
+			return score
 
 		for rule in self.config:
 			failed = False
