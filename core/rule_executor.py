@@ -27,7 +27,7 @@ class Executor:
 	# Check every rule and return True if needed score is reached
 	def shouldStabilize(self, rev):
 		overall_score = 0
-		final_expiry = None
+		final_expiry = 0
 		self.loadRules()
 		scores = {}
 		for rule in self.rules:
