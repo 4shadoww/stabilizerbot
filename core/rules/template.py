@@ -10,4 +10,7 @@ class YunoModule:
 	}
 
 	def run(self, rev):
-		return 0
+		score = 0
+		expiry = None
+
+		return [score, expiry]

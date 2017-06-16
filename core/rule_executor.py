@@ -29,6 +29,7 @@ class Executor:
 	# Check every rule and return True if needed score is reached
 	def shouldStabilize(self, rev):
 		overall_score = 0
+		final_expiry = None
 		self.loadRules()
 		scores = {}
 
@@ -39,7 +40,7 @@ class Executor:
 					rule.config = config_loader.current_config["rules"][rule.name]
 					rule.cfg_ver = config_loader.cfg_ver
 
-				score = rule.run(rev)
+				score, expiry = rule.run(rev)["score"]
 				scores[rule.name] = score
 				printlog(rule.name, "on page:", rev["title"],  "score:", score)
 
@@ -47,6 +48,9 @@ class Executor:
 					return False
 
 				overall_score += score
+
+				if expiry and final_expiry < expiry:
+					final_expiry = expiry
 			except:
 				scores[rule.name] = 0
 				printlog("unexcepted error on", rule.name, "check crasreport")
@@ -55,7 +59,7 @@ class Executor:
 		if overall_score >= config_loader.current_config["core"]["required_score"]:
 			if config_loader.current_config["core"]["log_decision"] == "positive" or config_loader.current_config["core"]["log_decision"] == "both":
 				logdecision(rev["title"], rev["revision"]["new"], rev["user"], rev["timestamp"], scores)
-			return True
+			return final_expiry
 
 		if config_loader.current_config["core"]["log_decision"] == "negative" or config_loader.current_config["core"]["log_decision"] == "both":
 			logdecision(rev["title"], rev["revision"]["new"], rev["user"], rev["timestamp"], scores)

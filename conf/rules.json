@@ -1,6 +1,7 @@
 {
 	"anonreverts": [
 			{
+					"expiry": 24,
 					"hours": 1,
 					"reverts_required": 2,
 					"score": 1,
@@ -21,7 +22,8 @@
 									"max_true": 0.15
 							}
 					},
-					"score": 1
+					"score": 1,
+					"expiry": 24
 			}
 	],
 	"abusefilters": {
@@ -40,15 +42,18 @@
 			"rules": [
 					{
 							"hits": 1,
+							"expiry": 24,
 							"score": 1
 					},
 					{
 							"hits": 4,
+							"expiry": 24,
 							"score": 2
 					}
 			]
 	},
 	"greylist": {
-			"list_path": "Käyttäjä:4shadowwBOT/greylist.json"
+			"list_path": "Käyttäjä:4shadowwBOT/greylist.json",
+			"expiry": 24
 	}
 }

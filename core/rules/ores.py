@@ -42,7 +42,7 @@ class YunoModule:
 				if "error" in revid_data[item] and "probability" not in revid_data[item]:
 					if i <= 0:
 						printlog("error: failed to fetch ores revision data:", revid_data)
-						return 1
+						return False
 				else:
 					break
 
@@ -50,11 +50,12 @@ class YunoModule:
 
 	def run(self, rev):
 		score = 0
+		expiry = None
 
 		revid_data = self.getScores(rev)
 
-		if revid_data == 1:
-			return score
+		if not revid_data:
+			return [score, expiry]
 
 		for rule in self.config:
 			failed = False
@@ -79,5 +80,6 @@ class YunoModule:
 
 			if not failed and rule["score"] > score:
 				score = rule["score"]
+				expiry = rule["expiry"]
 
-		return score
+		return [score, expiry]

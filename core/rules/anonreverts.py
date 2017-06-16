@@ -7,6 +7,7 @@ class YunoModule:
 
 	config = [
 		{
+			"expiry": 24,
 			"hours": 1,
 			"reverts_required": 2,
 			"score": 1,
@@ -32,6 +33,6 @@ class YunoModule:
 							ip_reverts += 1
 
 		if ip_reverts >= rule["reverts_required"]:
-			return rule["score"]
+			return [rule["score"], rule["expiry"]]
 
-		return 0
+		return [0, None]

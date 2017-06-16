@@ -1,12 +1,23 @@
+## TODO: Make this code cleaner
+## TODO:
+
 # Import python modules
 import json
 from urllib.request import urlopen
+from urllib.parse import urlencode
+import traceback
 
 # Import pywikibot
 from pywikibot.comms import http as api_req
+from pywikibot.data import api
+import pywikibot
 
 # Import core modules
 from core import config_loader
+from core.log import *
+
+site = pywikibot.Site()
+site.login()
 
 def parameterMaker(base, values):
 	final_str = base
@@ -47,3 +58,49 @@ class MWAPI:
 		final = str(base_url+parameters).replace(" ", "%20")
 
 		return json.loads(api_req.fetch(final).content)
+
+	def stabilized(self, title):
+		final = "https://"+config_loader.current_config["core"]["lang"]+".wikipedia.org/w/api.php?action=query&prop=info|flagged&titles="+title+"&format=json"
+		final = final.replace(" ", "%20")
+
+		query = json.loads(api_req.fetch(final).content)
+		answer = query["query"]["pages"]
+
+		for pageid in answer:
+			if "flagged" not in answer[pageid]:
+				return False
+			elif answer[pageid]["flagged"]["level"] == 1:
+				return True
+			else:
+				return False
+
+		return False
+
+	def reviewed(self, title):
+		final = "https://"+config_loader.current_config["core"]["lang"]+".wikipedia.org/w/api.php?action=query&prop=info|flagged&titles="+title+"&format=json"
+		final = final.replace(" ", "%20")
+
+		query = json.loads(api_req.fetch(final).content)
+		answer = query["query"]["pages"]
+
+		for pageid in answer:
+			if "flagged" in answer[pageid]:
+				return True
+			else:
+				return False
+
+		return False
+
+	def stabilize(self, title, reason, expiry="infinite"):
+		edittoken = site.tokens['edit']
+
+		try:
+			req = api.Request(site=site, action="stabilize", title=title, reason=reason, default="stable", expiry=expiry, token=edittoken)
+			req.submit()
+		except:
+			printlog("error: failed to stabilize check crasreport for details")
+			print(traceback.format_exc())
+			crashreport(traceback.format_exc())
+			return False
+
+		return True

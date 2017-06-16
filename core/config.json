@@ -2,11 +2,12 @@
 	"lang": "fi",
 	"rules": ["anonreverts", "ores", "abusefilters", "greylist"],
 	"ign_rules": [],
+	"test": false,
 	"required_score": 2,
 	"namespaces": [0],
 	"stream_url": "https://stream.wikimedia.org/v2/stream/recentchange",
 	"config_mode": "online",
-	"online_conf_path": "Käyttäjä:4shadowwBOT/config.json",
+	"online_conf_path": "Käyttäjä:VakauttajaBot/config.json",
 	"enable_log": false,
 	"log_warnings": false,
 	"log_decision": "positive"

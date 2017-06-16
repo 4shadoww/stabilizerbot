@@ -10,12 +10,15 @@ class YunoModule:
 	list_ver = None
 
 	config = {
+		"expiry": 24,
 		"list_path": "Käyttäjä:4shadowwBOT/greylist.json"
 	}
 	greylist = None
 
 	def run(self, rev):
 		score = 0
+		expiry = None
+
 		page = pywikibot.Page(self.site, self.config["list_path"])
 
 		if page.latestRevision() != self.list_ver:
@@ -24,5 +27,6 @@ class YunoModule:
 		for user in self.greylist:
 			if user == rev["user"] and self.greylist[user] > score:
 				score = self.greylist[user]
+				expiry = self.config["expiry"]
 
-		return score
+		return [score, expiry]

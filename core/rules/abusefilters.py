@@ -13,10 +13,12 @@ class YunoModule:
 		"rules": [
 			{
 				"hits": 1,
+				"expiry": 24,
 				"score": 1
 			},
 			{
 				"hits": 5,
+				"expiry": 24,
 				"score": 2
 			}
 		]
@@ -26,6 +28,7 @@ class YunoModule:
 
 	def run(self, rev):
 		score = 0
+		expiry = None
 
 		end = datetime.timedelta(hours=self.config["hours"], minutes=0, seconds=0)
 		timeutc = datetime.datetime.utcnow()
@@ -43,5 +46,6 @@ class YunoModule:
 			if rule["hits"] <= len(result["query"]["abuselog"]):
 				if score < rule["score"]:
 					score = rule["score"]
+					expiry = rule["expiry"]
 
-		return score
+		return [score, expiry]
