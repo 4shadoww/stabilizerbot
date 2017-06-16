@@ -65,7 +65,7 @@ class MWAPI:
 
 		query = json.loads(api_req.fetch(final).content)
 		answer = query["query"]["pages"]
-		print(answer)
+		
 		for pageid in answer:
 			if "flagged" not in answer[pageid]:
 				return False
