@@ -60,16 +60,16 @@ class MWAPI:
 		return json.loads(api_req.fetch(final).content)
 
 	def stabilized(self, title):
-		final = "https://"+config_loader.current_config["core"]["lang"]+".wikipedia.org/w/api.php?action=query&prop=info|flagged&titles="+title+"&format=json"
+		final = "https://"+config_loader.current_config["core"]["lang"]+".wikipedia.org/w/api.php?action=query&prop=flagged&titles="+title+"&format=json"
 		final = final.replace(" ", "%20")
 
 		query = json.loads(api_req.fetch(final).content)
 		answer = query["query"]["pages"]
-
+		print(answer)
 		for pageid in answer:
 			if "flagged" not in answer[pageid]:
 				return False
-			elif answer[pageid]["flagged"]["level"] == 1:
+			elif "protection_level" in answer[pageid]["flagged"]:
 				return True
 			else:
 				return False

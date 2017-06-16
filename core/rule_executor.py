@@ -47,7 +47,6 @@ class Executor:
 				overall_score += score
 
 				if expiry and final_expiry < expiry:
-					print("toimi")
 					final_expiry = expiry
 			except:
 				scores[rule.name] = 0
