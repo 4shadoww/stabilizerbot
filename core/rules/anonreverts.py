@@ -33,6 +33,6 @@ class YunoModule:
 							ip_reverts += 1
 
 		if ip_reverts >= rule["reverts_required"]:
-			return [rule["score"], rule["expiry"]]
+			return rule["score"], rule["expiry"]
 
-		return [0, None]
+		return 0, None

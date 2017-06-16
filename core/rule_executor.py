@@ -10,9 +10,6 @@ class Executor:
 	rules = []
 	last_rules = None
 
-	def __init__(self):
-		self.loadRules()
-
 	# Load rules that are listed in config.json or in online config
 	def loadRules(self):
 		if self.last_rules != config_loader.current_config["core"]["rules"]:
@@ -32,7 +29,6 @@ class Executor:
 		final_expiry = None
 		self.loadRules()
 		scores = {}
-
 		for rule in self.rules:
 			try:
 				if rule.cfg_ver != config_loader.cfg_ver and rule.name in config_loader.current_config["rules"]:
@@ -40,7 +36,7 @@ class Executor:
 					rule.config = config_loader.current_config["rules"][rule.name]
 					rule.cfg_ver = config_loader.cfg_ver
 
-				score, expiry = rule.run(rev)["score"]
+				score, expiry = rule.run(rev)
 				scores[rule.name] = score
 				printlog(rule.name, "on page:", rev["title"],  "score:", score)
 

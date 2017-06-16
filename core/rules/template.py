@@ -13,4 +13,4 @@ class YunoModule:
 		score = 0
 		expiry = None
 
-		return [score, expiry]
+		return score, expiry

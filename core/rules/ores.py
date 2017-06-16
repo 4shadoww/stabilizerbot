@@ -55,7 +55,7 @@ class YunoModule:
 		revid_data = self.getScores(rev)
 
 		if not revid_data:
-			return [score, expiry]
+			return score, expiry
 
 		for rule in self.config:
 			failed = False
@@ -82,4 +82,4 @@ class YunoModule:
 				score = rule["score"]
 				expiry = rule["expiry"]
 
-		return [score, expiry]
+		return score, expiry

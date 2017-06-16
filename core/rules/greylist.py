@@ -29,4 +29,4 @@ class YunoModule:
 				score = self.greylist[user]
 				expiry = self.config["expiry"]
 
-		return [score, expiry]
+		return score, expiry

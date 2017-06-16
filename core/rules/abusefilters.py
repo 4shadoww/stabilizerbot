@@ -40,7 +40,7 @@ class YunoModule:
 
 		if "error" in result:
 			printlog("abusefilters error:",result["error"]["code"])
-			return score
+			return score, expiry
 
 		for rule in self.config["rules"]:
 			if rule["hits"] <= len(result["query"]["abuselog"]):
@@ -48,4 +48,4 @@ class YunoModule:
 					score = rule["score"]
 					expiry = rule["expiry"]
 
-		return [score, expiry]
+		return score, expiry
