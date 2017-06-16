@@ -13,6 +13,7 @@ class Executor:
 	# Load rules that are listed in config.json or in online config
 	def loadRules(self):
 		if self.last_rules != config_loader.current_config["core"]["rules"]:
+			self.rules = []
 			printlog("loading rules")
 			self.last_rules = config_loader.current_config["core"]["rules"]
 			for rule in config_loader.current_config["core"]["rules"]:
