@@ -14,14 +14,8 @@ class YunoModule:
 				"damaging": {"max_false": 0.15, "min_true": 0.8},
 				"goodfaith": {"min_false": 0.8, "max_true": 0.15}
 			},
-			"score": 1
-		},
-		{
-			"models": {
-				"damaging": {"max_false": 0.1, "min_true": 0.9},
-				"goodfaith": {"min_false": 0.9, "max_true": 0.1}
-			},
-			"score": 2
+			"score": 1,
+			"expiry": 24
 		}
 	]
 
