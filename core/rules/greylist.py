@@ -11,7 +11,7 @@ class YunoModule:
 
 	config = {
 		"expiry": 24,
-		"list_path": "Käyttäjä:4shadowwBOT/greylist.json"
+		"list_path": "Käyttäjä:VakauttajaBot/greylist.json"
 	}
 	greylist = None
 

@@ -53,7 +53,7 @@
 			]
 	},
 	"greylist": {
-			"list_path": "Käyttäjä:4shadowwBOT/greylist.json",
+			"list_path": "Käyttäjä:VakauttajaBot/greylist.json",
 			"expiry": 24
 	}
 }
