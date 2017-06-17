@@ -1,7 +1,7 @@
 {
 	"fi": {
 		"reasons": {
-			"YS1": "Botti vakautti artikkelin automaattisesti mahdollisesti haitallisen muokkauksen takia."
+			"YV1": "Botti vakautti artikkelin automaattisesti mahdollisesti haitallisen muutoksen %s takia."
 		}
 	}
 }

@@ -84,7 +84,12 @@ class Worker:
 		dtexpiry = datetime.datetime.utcnow() + datetime.timedelta(hours=expiry, minutes=0, seconds=0)
 		strexpiry = dtexpiry.strftime("%Y-%m-%dT%H:%M:%SZ")
 		# Stabilize
-		self.api.stabilize(rev["title"], self.dictionary[cfgl.current_config["core"]["lang"]]["reasons"]["YS1"], expiry=strexpiry)
+		base_url = "https://"+cfgl.current_config["core"]["lang"]+".wikipedia.org/w/index.php?title=Eric_Savolainen&diff="
+		revlink = "["+base_url+str(rev["revision"]["new"])+" "+str(rev["revision"]["new"])+"]"
+
+		reason = self.dictionary[cfgl.current_config["core"]["lang"]]["reasons"]["YV1"] % revlink
+		
+		self.api.stabilize(rev["title"], reason, expiry=strexpiry)
 
 		return True
 
