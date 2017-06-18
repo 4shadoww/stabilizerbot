@@ -19,8 +19,8 @@ from core.log import *
 site = pywikibot.Site()
 site.login()
 
-def parameterMaker(base, values):
-	final_str = base
+def parameterMaker(values):
+	final_str = ""
 	for i in range(len(values)):
 		final_str += str(values[i])
 
@@ -30,42 +30,67 @@ def parameterMaker(base, values):
 	return final_str
 
 class ORES:
-	base_url = "https://ores.wikimedia.org/scores/"+config_loader.current_config["core"]["lang"]+"wiki"
-	revids_url = "?revids="
-	models_url = "&models="
+	base_url = "https://ores.wikimedia.org/scores/"+config_loader.current_config["core"]["lang"]+"wiki?"
 
 	def getScore(self, revids, models=["reverted", "goodfaith", "damaging"]):
-		request_url = self.base_url+parameterMaker(self.revids_url, revids)+parameterMaker(self.models_url, models)
+		params = {
+			"revids": parameterMaker(revids),
+			"models": parameterMaker(models)
+		}
+
+		request_url = self.base_url + urlencode(params)
+
 		request = urlopen(request_url)
 		try:
 			request = request.read().decode('utf8')
+			return json.loads(request)
 		except AttributeError:
-			pass
-		return json.loads(request)
-
+			return False
 class MWAPI:
+	base_url = "https://"+config_loader.current_config["core"]["lang"]+".wikipedia.org/w/api.php?"
 
 	def getRevision(self, revids, param=["ids", "timestamp", "flags", "user"]):
-		base_url = "https://"+config_loader.current_config["core"]["lang"]+".wikipedia.org/w/api.php?action=query&prop=revisions"
-		parameters = parameterMaker("&revids=", revids)+parameterMaker("&rvprop=", param)+"&format=json"
-		final = str(base_url+parameters).replace(" ", "%20")
+		params = {
+			"action": "query",
+			"prop": "revisions",
+			"revids": parameterMaker(revids),
+			"rvprop": parameterMaker(param),
+			"format": "json"
+		}
+
+		final = self.base_url + urlencode(params)
 
 		return json.loads(api_req.fetch(final).content)
 
 	def getAbuseFiler(self, user, timestamp, filters, param=["ids", "user", "title", "action", "result", "timestamp", "hidden", "revid"]):
-		base_url = "https://"+config_loader.current_config["core"]["lang"]+".wikipedia.org/w/api.php?action=query&list=abuselog"
-		parameters = parameterMaker("&aflfilter=", filters)+parameterMaker("&aflprop=", param)+"&afluser="+user+"&afldir=newer"+"&aflstart="+timestamp+"&format=json"
-		final = str(base_url+parameters).replace(" ", "%20")
+		params = {
+			"action": "query",
+			"list": "abuselog",
+			"aflfilter": parameterMaker(filters),
+			"aflprop": parameterMaker(param),
+			"afluser": user,
+			"afldir": "newer",
+			"aflstart": timestamp,
+			"format": "json"
+		}
+
+		final = self.base_url + urlencode(params)
 
 		return json.loads(api_req.fetch(final).content)
 
 	def stabilized(self, title):
-		final = "https://"+config_loader.current_config["core"]["lang"]+".wikipedia.org/w/api.php?action=query&prop=flagged&titles="+title+"&format=json"
-		final = final.replace(" ", "%20")
+		params = {
+			"action": "query",
+			"prop": "flagged",
+			"titles": title,
+			"format": "json"
+		}
+
+		final = self.base_url + urlencode(params)
 
 		query = json.loads(api_req.fetch(final).content)
 		answer = query["query"]["pages"]
-		
+
 		for pageid in answer:
 			if "flagged" not in answer[pageid]:
 				return False
@@ -77,8 +102,14 @@ class MWAPI:
 		return False
 
 	def reviewed(self, title):
-		final = "https://"+config_loader.current_config["core"]["lang"]+".wikipedia.org/w/api.php?action=query&prop=info|flagged&titles="+title+"&format=json"
-		final = final.replace(" ", "%20")
+		params = {
+			"action": "query",
+			"prop": "flagged",
+			"titles": title,
+			"format": "json"
+		}
+
+		final = self.base_url + urlencode(params)
 
 		query = json.loads(api_req.fetch(final).content)
 		answer = query["query"]["pages"]
