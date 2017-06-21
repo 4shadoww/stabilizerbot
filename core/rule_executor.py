@@ -1,6 +1,7 @@
 # Import python modules
 import importlib
 import traceback
+import sys
 
 # Import core modules
 from core import config_loader
@@ -48,6 +49,10 @@ class Executor:
 
 				if expiry and final_expiry < expiry:
 					final_expiry = expiry
+			except KeyboardInterrupt:
+				print("terminating yuno...")
+				sys.exit(0)
+
 			except:
 				scores[rule.name] = 0
 				printlog("unexcepted error on", rule.name, "check crasreport")
