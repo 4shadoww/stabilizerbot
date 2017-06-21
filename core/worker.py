@@ -4,6 +4,7 @@ import time
 import json
 from sseclient import SSEClient as EventSource
 from threading import Thread
+import sys
 
 # Import core modules
 from core import config_loader as cfgl
@@ -108,6 +109,7 @@ class Worker:
 						# Check should revision to be checked at all
 						if self.shouldCheck(change):
 							expiry = self.r_exec.shouldStabilize(change)
+							statusreport("running...")
 							if expiry and not cfgl.current_config["core"]["test"]:
 								self.stabilize(change, expiry)
 
@@ -115,3 +117,7 @@ class Worker:
 			print("terminating yuno...")
 			self.killer.kill = True
 			self.cf_updater.join()
+		except:
+			printlog("error: faced unexcepted error")
+			printlog("terminating threads")
+			sys.exit(1)

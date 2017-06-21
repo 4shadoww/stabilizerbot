@@ -67,3 +67,17 @@ def logdecision(title, revid, user, timestamp, scores):
 	decfile.flush()
 	decfile.write(finalmessage+"\n")
 	decfile.close()
+
+def statusreport(*message):
+	if current_config["core"]["status_log"]:
+		statusfile = open(path.main()+"logs/status", "w")
+		finalmessage = ""
+		for l, mes in enumerate(message):
+			finalmessage += str(mes)
+			if l != len(message):
+				finalmessage += " "
+
+		time = datetime.datetime.now()
+		line = str(time)+" "+finalmessage+"\n"
+		statusfile.write(line)
+		statusfile.close()
