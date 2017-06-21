@@ -11,6 +11,7 @@
 	"enable_log": false,
 	"log_warnings": false,
 	"status_log": true,
+	"status_lps": 10,
 	"log_decision": "positive"
 
 }

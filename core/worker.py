@@ -95,6 +95,9 @@ class Worker:
 
 	def run(self):
 		try:
+			statusreport("starting...")
+			laststatus = datetime.datetime.utcnow()
+
 			wiki = cfgl.current_config["core"]["lang"]+"wiki"
 			# Event stream
 			for event in EventSource(cfgl.current_config["core"]["stream_url"]):
@@ -109,7 +112,11 @@ class Worker:
 						# Check should revision to be checked at all
 						if self.shouldCheck(change):
 							expiry = self.r_exec.shouldStabilize(change)
-							statusreport("running...")
+
+							if datetime.datetime.utcnow() - laststatus >= datetime.timedelta(hours=0, minutes=0, seconds=cfgl.current_config["core"]["status_lps"]):
+								laststatus = datetime.datetime.utcnow()
+								statusreport("running...")
+
 							if expiry and not cfgl.current_config["core"]["test"]:
 								self.stabilize(change, expiry)
 
