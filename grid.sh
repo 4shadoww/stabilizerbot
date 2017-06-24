@@ -9,5 +9,5 @@ export LC_ALL="en_US.UTF-8"
 export PYTHONIOENCODING="UTF-8"
 
 # Start yunomi
-YUNOMI="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/yuno.py"
+YUNOMI="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/stabilizer.py"
 $YUNOMI

@@ -22,7 +22,7 @@ def main():
 		wr = worker.Worker()
 		wr.run()
 	except KeyboardInterrupt:
-		print("terminating yuno...")
+		print("terminating stabilizer...")
 
 if __name__ == "__main__":
 	main()

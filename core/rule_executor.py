@@ -11,7 +11,7 @@ class Executor:
 	rules = []
 	last_rules = None
 
-	# Load rules that are listed in config.json or in online config
+	# Load rules that are listed in config.json at core or in online config
 	def loadRules(self):
 		if self.last_rules != config_loader.current_config["core"]["rules"]:
 			self.rules = []
