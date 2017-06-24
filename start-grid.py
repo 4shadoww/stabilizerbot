@@ -1,5 +1,3 @@
-
-
 import optparse
 import os
 from core import path
