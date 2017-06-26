@@ -55,7 +55,8 @@ Full explanion of config.json
 	"enable_log": false, <- Enable log
 	"status_log": true, <- Status log
 	"status_lps": 10, <- Status logs per seconds
-	"log_decision": "positive" <- Log decisions (positive / negative / both)
+	"log_decision": "positive", <- Log decisions (positive / negative / both)
+	"s_delay": 300 <- Seconds to wait before stabilization
 }
 ```
 

@@ -50,6 +50,39 @@ class ConfigUpdate(Thread):
 			time.sleep(0.5)
 			times += 0.5
 
+class Stabilizer(Thread):
+
+	killer = None
+
+	def __init__(self, killer, rev, expiry):
+		self.killer = killer
+		self.rev = rev
+		self.expiry = expiry
+		super(Stabilizer, self).__init__()
+
+	def stabilize(self):
+		# Calculate expiry
+		dtexpiry = datetime.datetime.utcnow() + datetime.timedelta(hours=self.expiry, minutes=0, seconds=0)
+		strexpiry = dtexpiry.strftime("%Y-%m-%dT%H:%M:%SZ")
+		# Set reason
+		revlink = "[[Special:Diff/"+str(self.rev["revision"]["new"])+"|"+str(self.rev["revision"]["new"])+"]]"
+		reason = self.dictionary[cfgl.current_config["core"]["lang"]]["reasons"]["YV1"] % revlink
+
+		# Stabilize
+		self.api.stabilize(self.rev["title"], reason, expiry=strexpiry)
+
+		return True
+
+	def run(self):
+		time = 0
+		while time < cfgl.current_config["core"]["s_delay"]:
+			if self.killer.kill:
+				return
+			time.sleep(0.5)
+			time += 0.5
+
+		self.stabilize()
+
 class Worker:
 	r_exec = None
 	killer = None
@@ -80,19 +113,6 @@ class Worker:
 
 		return True
 
-	def stabilize(self, rev, expiry):
-		# Calculate expiry
-		dtexpiry = datetime.datetime.utcnow() + datetime.timedelta(hours=expiry, minutes=0, seconds=0)
-		strexpiry = dtexpiry.strftime("%Y-%m-%dT%H:%M:%SZ")
-		# Set reason
-		revlink = "[[Special:Diff/"+str(rev["revision"]["new"])+"|"+str(rev["revision"]["new"])+"]]"
-		reason = self.dictionary[cfgl.current_config["core"]["lang"]]["reasons"]["YV1"] % revlink
-		
-		# Stabilize
-		self.api.stabilize(rev["title"], reason, expiry=strexpiry)
-
-		return True
-
 	def run(self):
 		try:
 			statusreport("starting...")
@@ -118,7 +138,9 @@ class Worker:
 								statusreport("running...")
 
 							if expiry and not cfgl.current_config["core"]["test"]:
-								self.stabilize(change, expiry)
+								#self.stabilize(change, expiry)
+								stabilizer = Stabilizer(self.killer, change, expiry)
+								stabilizer.start()
 
 		except KeyboardInterrupt:
 			print("terminating stabilizer...")

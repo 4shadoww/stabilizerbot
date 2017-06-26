@@ -9,7 +9,7 @@ site = pywikibot.Site()
 
 # Get reverts from article
 # Used with tumple that createEditList returns
-def getRevertList(edits, inf = False, end_hours = 3, end_minutes = 0, end_seconds = 0):
+def getRevertList(edits, inf = False, end_hours = 0, end_minutes = 0, end_seconds = 0):
 	reverts = []
 
 	end = datetime.timedelta(hours=end_hours, minutes=end_minutes, seconds=end_seconds)
@@ -28,7 +28,7 @@ def getRevertList(edits, inf = False, end_hours = 3, end_minutes = 0, end_second
 	return reverts
 
 # Create edit history from article
-def createEditList(title, inf = False, end_hours = 3, end_minutes = 0, end_seconds = 0):
+def createEditList(title, inf = False, end_hours = 0, end_minutes = 0, end_seconds = 0):
 	edits = []
 
 	end = datetime.timedelta(hours=end_hours, minutes=end_minutes, seconds=end_seconds)
