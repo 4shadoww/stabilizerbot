@@ -74,12 +74,12 @@ class Stabilizer(Thread):
 		return True
 
 	def run(self):
-		time = 0
-		while time < cfgl.current_config["core"]["s_delay"]:
+		times = 0
+		while times < cfgl.current_config["core"]["s_delay"]:
 			if self.killer.kill:
 				return
 			time.sleep(0.5)
-			time += 0.5
+			times += 0.5
 
 		self.stabilize()
 
