@@ -53,6 +53,8 @@ class ConfigUpdate(Thread):
 class Stabilizer(Thread):
 
 	killer = None
+	f = open(path.main()+"core/dict.json")
+	dictionary = json.load(f)
 
 	def __init__(self, killer, rev, expiry):
 		self.killer = killer
@@ -88,8 +90,6 @@ class Worker:
 	killer = None
 	cf_updater = None
 	api = mwapi.MWAPI()
-	f = open(path.main()+"core/dict.json")
-	dictionary = json.load(f)
 
 	def __init__(self):
 		self.r_exec = rule_executor.Executor()
