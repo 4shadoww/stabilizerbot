@@ -55,6 +55,7 @@ class Stabilizer(Thread):
 	killer = None
 	f = open(path.main()+"core/dict.json")
 	dictionary = json.load(f)
+	api = mwapi.MWAPI()
 
 	def __init__(self, killer, rev, expiry):
 		self.killer = killer
