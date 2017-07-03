@@ -5,6 +5,7 @@ import json
 from sseclient import SSEClient as EventSource
 from threading import Thread
 import sys
+import resource
 
 # Import core modules
 from core import config_loader as cfgl
@@ -97,12 +98,13 @@ class Stabilizer(Thread):
 		times = 0
 		while times < cfgl.current_config["core"]["s_delay"]:
 			if self.killer.kill:
-				return
+				return False
 			time.sleep(0.5)
 			times += 0.5
 
 		if shouldCheck(self.rev):
 			self.stabilize()
+		return True
 
 class Worker:
 	r_exec = None
@@ -138,7 +140,7 @@ class Worker:
 
 							if datetime.datetime.utcnow() - laststatus >= datetime.timedelta(hours=0, minutes=0, seconds=cfgl.current_config["core"]["status_lps"]):
 								laststatus = datetime.datetime.utcnow()
-								statusreport("running...")
+								statusreport("memory usage:", resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
 
 							if expiry and not cfgl.current_config["core"]["test"]:
 								#self.stabilize(change, expiry)
