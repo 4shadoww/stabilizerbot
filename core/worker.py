@@ -6,6 +6,7 @@ from sseclient import SSEClient as EventSource
 from threading import Thread
 import sys
 import resource
+import traceback
 
 # Import core modules
 from core import config_loader as cfgl
@@ -152,6 +153,7 @@ class Worker:
 			self.killer.kill = True
 			self.cf_updater.join()
 		except:
-			printlog("error: faced unexcepted error")
+			printlog("error: faced unexcepted error check crash report")
+			crashreport(traceback.format_exc())
 			printlog("terminating threads")
 			sys.exit(1)
