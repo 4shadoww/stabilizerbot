@@ -23,6 +23,7 @@ def main():
 		wr.run()
 	except KeyboardInterrupt:
 		print("terminating stabilizer...")
+		sys.exit(1)
 
 if __name__ == "__main__":
 	main()
