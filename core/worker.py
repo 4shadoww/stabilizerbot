@@ -13,6 +13,23 @@ from core import mwapi
 from core.log import *
 from core import path
 
+api = mwapi.MWAPI()
+
+def shouldCheck(rev):
+	# Check should revision to be checked at all
+	revs = api.getRevision([rev["revision"]["new"]])
+
+	if "badrevids" in revs["query"]:
+		return False
+
+	if api.stabilized(rev["title"]):
+		return False
+
+	if not api.reviewed:
+		return False
+
+	return True
+
 # Object that sends kill signal to ConfigUpdater thread
 class Killer:
 	kill = False
@@ -72,7 +89,7 @@ class Stabilizer(Thread):
 		reason = self.dictionary[cfgl.current_config["core"]["lang"]]["reasons"]["YV1"] % revlink
 
 		# Stabilize
-		self.api.stabilize(self.rev["title"], reason, expiry=strexpiry)
+		api.stabilize(self.rev["title"], reason, expiry=strexpiry)
 
 		return True
 
@@ -84,13 +101,13 @@ class Stabilizer(Thread):
 			time.sleep(0.5)
 			times += 0.5
 
-		self.stabilize()
+		if shouldCheck(self.rev):
+			self.stabilize()
 
 class Worker:
 	r_exec = None
 	killer = None
 	cf_updater = None
-	api = mwapi.MWAPI()
 
 	def __init__(self):
 		self.r_exec = rule_executor.Executor()
@@ -98,21 +115,6 @@ class Worker:
 		self.killer = Killer()
 		self.cf_updater = ConfigUpdate(self.killer)
 		self.cf_updater.start()
-
-	def shouldCheck(self, rev):
-		# Check should revision to be checked at all
-		revs = self.api.getRevision([rev["revision"]["new"]])
-
-		if "badrevids" in revs["query"]:
-			return False
-
-		if self.api.stabilized(rev["title"]):
-			return False
-
-		if not self.api.reviewed:
-			return False
-
-		return True
 
 	def run(self):
 		try:
@@ -131,7 +133,7 @@ class Worker:
 
 					if change["wiki"] == wiki and change["type"] == "edit" and change["namespace"] in cfgl.current_config["core"]["namespaces"]:
 						# Check should revision to be checked at all
-						if self.shouldCheck(change):
+						if shouldCheck(change):
 							expiry = self.r_exec.shouldStabilize(change)
 
 							if datetime.datetime.utcnow() - laststatus >= datetime.timedelta(hours=0, minutes=0, seconds=cfgl.current_config["core"]["status_lps"]):
