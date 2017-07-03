@@ -6,7 +6,7 @@ from pywikibot.site import APISite
 import pywikibot
 
 site = pywikibot.Site()
-
+#TODO: Rewrite completely
 # Get reverts from article
 # Used with tumple that createEditList returns
 def getRevertList(edits, inf = False, end_hours = 0, end_minutes = 0, end_seconds = 0):
