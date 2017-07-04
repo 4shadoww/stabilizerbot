@@ -1,12 +1,12 @@
 from core.rule_core import *
-from core import mwapi
+from core import yapi
 
 class YunoModule:
 
 	name = "ores"
 	cfg_ver = None
 
-	ores_api = mwapi.ORES()
+	ores_api = yapi.ORES
 
 	config = [
 		{
@@ -35,7 +35,7 @@ class YunoModule:
 			for item in revid_data:
 				if "error" in revid_data[item] and "probability" not in revid_data[item]:
 					if i <= 0:
-						printlog("error: failed to fetch ores revision data:", revid_data)
+						logger.error("failed to fetch ores revision data: %s" % str(revid_data))
 						return False
 				else:
 					break

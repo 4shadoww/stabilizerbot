@@ -1,7 +1,4 @@
-user-config.py
+user_config.py
 __pycache__/
-/apicache/
-/throttle.ctrl
-/pywikibot.lwp
 /logs/*
 test.py

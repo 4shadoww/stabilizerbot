@@ -5,17 +5,18 @@ import json
 from sseclient import SSEClient as EventSource
 from threading import Thread
 import sys
-import resource
 import traceback
+import logging
 
 # Import core modules
 from core import config_loader as cfgl
 from core import rule_executor
-from core import mwapi
-from core.log import *
+from core import yapi
 from core import path
+from core import timelib
 
-api = mwapi.MWAPI()
+api = yapi.MWAPI
+logger = logging.getLogger("infolog")
 
 def shouldCheck(rev):
 	# Check should revision to be checked at all
@@ -46,10 +47,10 @@ class ConfigUpdate(Thread):
 		super(ConfigUpdate, self).__init__()
 
 	def run(self):
-		if cfgl.current_config["core"]["config_mode"] == "online":
-			printlog("online config mode enabled")
+		if cfgl.cur_conf["core"]["config_mode"] == "online":
+			logger.info("online config mode enabled")
 		else:
-			printlog("local config mode enabled")
+			logger.info("local config mode enabled")
 
 		uf = 30
 		times = uf
@@ -58,7 +59,7 @@ class ConfigUpdate(Thread):
 				return
 			if times >= uf:
 				times = 0
-				if cfgl.current_config["core"]["config_mode"] == "online":
+				if cfgl.cur_conf["core"]["config_mode"] == "online":
 					cfgl.checkForOnlineUpdate()
 				else:
 					cfgl.checkForLocalUpdate()
@@ -74,7 +75,6 @@ class Stabilizer(Thread):
 	killer = None
 	f = open(path.main()+"core/dict.json")
 	dictionary = json.load(f)
-	api = mwapi.MWAPI()
 
 	def __init__(self, killer, rev, expiry):
 		self.killer = killer
@@ -85,19 +85,18 @@ class Stabilizer(Thread):
 	def stabilize(self):
 		# Calculate expiry
 		dtexpiry = datetime.datetime.utcnow() + datetime.timedelta(hours=self.expiry, minutes=0, seconds=0)
-		strexpiry = dtexpiry.strftime("%Y-%m-%dT%H:%M:%SZ")
 		# Set reason
 		revlink = "[[Special:Diff/"+str(self.rev["revision"]["new"])+"|"+str(self.rev["revision"]["new"])+"]]"
-		reason = self.dictionary[cfgl.current_config["core"]["lang"]]["reasons"]["YV1"] % revlink
+		reason = self.dictionary[cfgl.cur_conf["core"]["lang"]]["reasons"]["YV1"] % revlink
 
 		# Stabilize
-		api.stabilize(self.rev["title"], reason, expiry=strexpiry)
+		api.stabilize(self.rev["title"], reason, expiry=timelib.toString(dtexpiry))
 
 		return True
 
 	def run(self):
 		times = 0
-		while times < cfgl.current_config["core"]["s_delay"]:
+		while times < cfgl.cur_conf["core"]["s_delay"]:
 			if self.killer.kill:
 				return False
 			time.sleep(0.5)
@@ -121,12 +120,9 @@ class Worker:
 
 	def run(self):
 		try:
-			statusreport("starting...")
-			laststatus = datetime.datetime.utcnow()
-
-			wiki = cfgl.current_config["core"]["lang"]+"wiki"
+			wiki = cfgl.cur_conf["core"]["lang"]+"wiki"
 			# Event stream
-			for event in EventSource(cfgl.current_config["core"]["stream_url"]):
+			for event in EventSource(cfgl.cur_conf["core"]["stream_url"]):
 				# Filter event stream
 				if event.event == 'message':
 					try:
@@ -134,16 +130,11 @@ class Worker:
 					except ValueError:
 						continue
 
-					if change["wiki"] == wiki and change["type"] == "edit" and change["namespace"] in cfgl.current_config["core"]["namespaces"]:
+					if change["wiki"] == wiki and change["type"] == "edit" and change["namespace"] in cfgl.cur_conf["core"]["namespaces"]:
 						# Check should revision to be checked at all
 						if shouldCheck(change):
 							expiry = self.r_exec.shouldStabilize(change)
-							usagereport("memory usage:", resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
-							if datetime.datetime.utcnow() - laststatus >= datetime.timedelta(hours=0, minutes=0, seconds=cfgl.current_config["core"]["status_lps"]):
-								laststatus = datetime.datetime.utcnow()
-								statusreport("running...")
-
-							if expiry and not cfgl.current_config["core"]["test"]:
+							if expiry and not cfgl.cur_conf["core"]["test"]:
 								#self.stabilize(change, expiry)
 								stabilizer = Stabilizer(self.killer, change, expiry)
 								stabilizer.start()
@@ -153,7 +144,7 @@ class Worker:
 			self.killer.kill = True
 			self.cf_updater.join()
 		except:
-			printlog("error: faced unexcepted error check crash report")
-			crashreport(traceback.format_exc())
-			printlog("terminating threads")
+			logger.error("error: faced unexcepted error check crash report")
+			logger.critical(traceback.format_exc())
+			logger.info("terminating threads")
 			sys.exit(1)

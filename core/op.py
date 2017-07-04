@@ -1,45 +1,21 @@
 # Import python modules
 import datetime
 
-# Import pywikibot
-from pywikibot.site import APISite
-import pywikibot
+from core import timelib
+from core import yapi
 
-site = pywikibot.Site()
-#TODO: Rewrite completely
+api = yapi.MWAPI
+
 # Get reverts from article
-# Used with tumple that createEditList returns
-def getRevertList(edits, inf = False, end_hours = 0, end_minutes = 0, end_seconds = 0):
+def getReverts(title, hours=1):
 	reverts = []
 
-	end = datetime.timedelta(hours=end_hours, minutes=end_minutes, seconds=end_seconds)
-
-	timeutc = datetime.datetime.utcnow()
-
+	end = datetime.datetime.utcnow() - datetime.timedelta(hours=hours)
+	edits = api.getPageHistory(title, rvprop="timestamp|user|content|ids", rvend=timelib.toString(end))
 	for i in range(len(edits)):
-		if edits[i]["timestamp"] < timeutc-end and not inf:
-			break
-
 		for x in range(i+1, len(edits)):
-			if edits[i]["text"] == edits[x]["text"]:
-				revert = {"reverter": edits[i]["user"], "victim": edits[x]["user"], "revid": edits[i]["revid"], "oldrevid": edits[x]["revid"]}
+			if edits[i]["*"] == edits[x]["*"]:
+				revert = {"reverter": edits[i]["user"], "victim": edits[i+1]["user"], "revid": edits[i]["revid"], "oldrevid": edits[i+1]["revid"]}
 				reverts.append(revert)
 				break
 	return reverts
-
-# Create edit history from article
-def createEditList(title, inf = False, end_hours = 0, end_minutes = 0, end_seconds = 0):
-	edits = []
-
-	end = datetime.timedelta(hours=end_hours, minutes=end_minutes, seconds=end_seconds)
-	timeutc = datetime.datetime.utcnow()
-
-	page = pywikibot.Page(site, title)
-
-	for rev in page.getVersionHistory():
-		if rev[1] < timeutc-end and not inf:
-			break
-		edit =  {"title": title, "text": page.getOldVersion(rev[0]), "user": rev[2], "revid": rev[0], "timestamp": rev[1]}
-		edits.append(edit)
-
-	return edits

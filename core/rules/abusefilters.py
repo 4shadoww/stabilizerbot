@@ -1,6 +1,8 @@
-from core.rule_core import *
-from core import mwapi
 import datetime
+
+from core.rule_core import *
+from core import yapi
+from core import timelib
 
 class YunoModule:
 
@@ -24,22 +26,20 @@ class YunoModule:
 		]
 	}
 
-	api = mwapi.MWAPI()
+	api = yapi.MWAPI
 
 	def run(self, rev):
 		score = 0
 		expiry = None
 
-		end = datetime.timedelta(hours=self.config["hours"], minutes=0, seconds=0)
-		timeutc = datetime.datetime.utcnow()
+		end = datetime.timedelta(hours=self.config["hours"])
 
-		time = timeutc-end
-		time = time.strftime('%Y-%m-%dT%H:%M:%SZ')
+		time =  timelib.toString(datetime.datetime.utcnow()-end)
 
 		result = self.api.getAbuseFiler(rev["user"], time, self.config["filters"])
 
 		if "error" in result:
-			printlog("abusefilters error:",result["error"]["code"])
+			logger.error("abusefilters error: %s" % result["error"]["code"])
 			return score, expiry
 
 		for rule in self.config["rules"]:

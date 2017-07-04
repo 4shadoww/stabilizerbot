@@ -4,18 +4,16 @@ import traceback
 import sys
 import glob
 import os
+import logging
 
 # Import core modules
 from core import path
 
-# Import pywikibot
-import pywikibot
-
 # Load core config for startup
-current_config = {}
+cur_conf = {}
 try:
 	core_config_f = open(path.main()+"core/config.json", "r")
-	current_config["core"] = json.load(core_config_f)
+	cur_conf["core"] = json.load(core_config_f)
 	core_config_f.close()
 except:
 	print("error: failed  to load core config")
@@ -24,10 +22,11 @@ except:
 	sys.exit(1)
 
 # Import core modules
-from core.log import *
+from core import yapi
+
+logger = logging.getLogger("infolog")
 
 cfg_ver = 0
-site = pywikibot.Site()
 
 def updateConfigItems(holder, new):
 	for item in new:
@@ -42,7 +41,7 @@ def updateConfig(holder, new):
 
 # Check for new local configs
 def checkForLocalUpdate():
-	global current_config
+	global cur_conf
 	global cfg_ver
 	for conf in glob.glob(path.main()+"conf/"+"*.json"):
 		try:
@@ -50,34 +49,35 @@ def checkForLocalUpdate():
 			conf_json = json.load(conf_f)
 			conf_f.close()
 		except:
-			printlog("error: failed to load config from", conf, "check crashreport for more info")
-			crashreport(traceback.format_exc())
+			logger.error("failed to load config from %s check crashreport for more info" % conf)
+			logger.critical(traceback.format_exc())
 			continue
 		namestr = os.path.basename(conf)[:-5]
-		if namestr not in current_config or current_config[namestr] != conf_json:
-			current_config[namestr] = conf_json
+		if namestr not in cur_conf or cur_conf[namestr] != conf_json:
+			cur_conf[namestr] = conf_json
 			cfg_ver += 1
-			printlog("new local config \""+namestr+"\" loaded to core")
+			logger.info("new local config \"%s\" loaded to core" % namestr)
 
 # Check for new online config
 def checkForOnlineUpdate():
 	global cfg_ver
-	global current_config
+	global cur_conf
 
-	page = pywikibot.Page(site, current_config["core"]["online_conf_path"])
+	lastrev = yapi.MWAPI.getLatestRev(cur_conf["core"]["online_conf_path"])
 
-	if not page.exists():
-		printlog("error: config page \""+core.config.online_conf_path+"\" doesn't exists")
+	if not lastrev:
+		logger.error("config page \"%s\" doesn't exists" % cur_conf["core"]["online_conf_path"])
 		return 1
-	if page.latestRevision() != cfg_ver:
-		printlog("found new online config:", page.latestRevision())
-		cfg_ver = page.latestRevision()
+	if lastrev != cfg_ver:
+		logger.info("found new online config: %s" % str(lastrev))
+		cfg_ver = lastrev
+		conf = yapi.MWAPI.getText(cur_conf["core"]["online_conf_path"])
 		try:
-			new = json.loads(page.text)
+			new = json.loads(conf)
 		except:
-			printlog("error: cannot load json:", traceback.format_exc())
-			crashreport(traceback.format_exc())
+			logger.error("cannot load json: %s" % traceback.format_exc())
+			logger.critical(traceback.format_exc())
 			return 1
 
-		updateConfig(current_config, new)
-		printlog("new online config loaded to core")
+		updateConfig(cur_conf, new)
+		logger.info("new online config loaded to core")

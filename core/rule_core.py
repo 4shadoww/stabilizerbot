@@ -1,5 +1,4 @@
-# Import core
-from core import op
+import logging
+logger = logging.getLogger("infolog")
+
 from core import config_loader
-import pywikibot
-from core.log import *

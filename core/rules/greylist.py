@@ -1,14 +1,14 @@
-from core.rule_core import *
 import json
+
+from core.rule_core import *
+from core import yapi
 
 class YunoModule:
 
 	name = "greylist"
 	cfg_ver = None
-
-	site = pywikibot.Site()
 	list_ver = None
-
+	api = yapi.MWAPI
 	config = {
 		"expiry": 24,
 		"list_path": "Käyttäjä:VakauttajaBot/greylist.json"
@@ -19,10 +19,15 @@ class YunoModule:
 		score = 0
 		expiry = None
 
-		page = pywikibot.Page(self.site, self.config["list_path"])
+		lastrev = self.api.getLatestRev(self.config["list_path"])
 
-		if page.latestRevision() != self.list_ver:
-			self.greylist = json.loads(page.text)
+		if not lastrev:
+			logger.critical("greylist not found")
+			return score, expiry
+
+		if lastrev != self.list_ver:
+			self.greylist = json.loads(self.api.getText(self.config["list_path"]))
+			self.list_ver = lastrev
 
 		for user in self.greylist:
 			if user == rev["user"] and self.greylist[user] > score:

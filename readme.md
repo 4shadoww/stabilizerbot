@@ -13,7 +13,7 @@ List of currently supported rules:
 
 ### Installing
 Recommended way to download stabilizerbot is to do it using Git, so you can keep it updated easily.
-Download over https:
+Download over http:
 ```
 git clone https://github.com/4shadoww/stabilizerbot.git
 ```
@@ -26,16 +26,13 @@ Running stabilizerbot is pretty straightforward:
 ```
 ./stabilizer.py
 ```
-But before running you should configure your bot correctly and create user-config.py for pywikibot.
+But before running you should configure your bot correctly and create user_config.py for username and password.
 
 ### Configuration
-First you should create user-config.py for pywikibot:
+First you should create user_config.py:
 ```python
-# -*- coding: utf-8  -*-
-from __future__ import unicode_literals
-family = 'wikipedia'
-mylang = 'en'
-usernames['wikipedia']['en'] = u'YourUsername'
+username = "myUsername"
+password = "myPassword"
 ```
 
 Core config is located at "core/config.json". From there set "lang" variable to match your language and do localization to "core/dict.json".
@@ -44,6 +41,8 @@ Full explanion of config.json
 ```
 {
 	"lang": "fi", <- Your language
+	"site": "https://fi.wikipedia.org", <- Site
+	"api_path": "/w/api.php",	<- Api path
 	"rules": ["anonreverts", "ores", "abusefilters", "greylist"], <- Rules that will be used
 	"ign_rules": [], <- Rules that will be ignored
 	"test": false, <- Test mode

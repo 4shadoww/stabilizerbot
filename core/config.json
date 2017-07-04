@@ -1,5 +1,7 @@
 {
 	"lang": "fi",
+	"site": "https://fi.wikipedia.org",
+	"api_path": "/w/api.php",
 	"rules": ["anonreverts", "ores", "abusefilters", "greylist"],
 	"ign_rules": [],
 	"test": false,
