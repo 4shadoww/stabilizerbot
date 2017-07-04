@@ -14,6 +14,7 @@ sys.path.append(path.main()+"core/lib/")
 
 # Import core modules
 from core import worker
+from core import session
 
 def setupLogging():
 	# Logging
@@ -51,6 +52,10 @@ def setupLogging():
 def main():
 	try:
 		setupLogging()
+
+		# Login
+		logger.info("logging...")
+		session.login()
 
 		# Start worker
 		wr = worker.Worker()
