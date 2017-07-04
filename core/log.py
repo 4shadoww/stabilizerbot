@@ -95,4 +95,3 @@ def usagereport(*message):
 		time = datetime.datetime.now()
 		line = str(time)+" "+finalmessage+"\n"
 		usagefile.write(line)
-		usagefile.close()
