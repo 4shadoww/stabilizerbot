@@ -12,9 +12,6 @@ if current_config["core"]["enable_log"]:
 if current_config["core"]["log_warnings"]:
 	warfile = open(path.main()+"logs/warnings.log", "a")
 
-if current_config["core"]["usage_log"]:
-	usagefile = open(path.main()+"logs/usage.txt", "a")
-
 def printlog(*message, end="\n"):
 	finalmessage = ""
 	for l, mes in enumerate(message):
@@ -86,6 +83,8 @@ def statusreport(*message):
 		statusfile.close()
 def usagereport(*message):
 	if current_config["core"]["usage_log"]:
+		usagefile = open(path.main()+"logs/usage.txt", "a")
+
 		finalmessage = ""
 		for l, mes in enumerate(message):
 			finalmessage += str(mes)
@@ -94,4 +93,6 @@ def usagereport(*message):
 
 		time = datetime.datetime.now()
 		line = str(time)+" "+finalmessage+"\n"
+		usagefile.flush()
 		usagefile.write(line)
+		usagefile.close()
