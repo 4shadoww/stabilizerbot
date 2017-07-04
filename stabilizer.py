@@ -52,7 +52,7 @@ def setupLogging():
 def main():
 	try:
 		setupLogging()
-
+		logger = logging.getLogger("infolog")
 		# Login
 		logger.info("logging...")
 		session.login()
