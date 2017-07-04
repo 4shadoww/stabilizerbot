@@ -36,7 +36,17 @@ def setupLogging():
 	# Add handlers
 	logger.addHandler(ch)
 	logger.addHandler(il)
-	logger.addHandler(el)
+	#logger.addHandler(el)
+
+	# Stable logger
+	slogger = logging.getLogger("stablelog")
+	slogger.setLevel(logging.DEBUG)
+	# Info log
+	isl = logging.FileHandler(path.main()+"logs/stable.log")
+	isl.setLevel(logging.INFO)
+	isl.setFormatter(formatter)
+	# Add handlers
+	slogger.addHandler(isl)
 
 def main():
 	try:

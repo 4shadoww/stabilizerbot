@@ -10,6 +10,9 @@ from core import config_loader
 # Get logger
 logger = logging.getLogger("infolog")
 
+# Get stable logger
+slogger = logging.getLogger("stablelog")
+
 class Executor:
 	rules = []
 	last_rules = None
@@ -67,6 +70,6 @@ class Executor:
 			return final_expiry
 
 		if config_loader.cur_conf["core"]["log_decision"] == "negative" or config_loader.cur_conf["core"]["log_decision"] == "both":
-			logdecision(rev["title"], rev["revision"]["new"], rev["user"], rev["timestamp"], scores)
+			slogger.info("title: %s, revid: %s, user: %s, timestamp: %s, scores: %s" % (rev["title"], str(rev["revision"]["new"]), rev["user"], str(rev["timestamp"]), str(scores)))
 
 		return False
