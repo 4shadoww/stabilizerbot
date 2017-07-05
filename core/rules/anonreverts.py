@@ -21,9 +21,10 @@ class YunoModule:
 
 	def run(self, rev):
 		for rule in self.config:
-			reverts = op.getReverts(rev["title"], hours=rule["hours"])
 			ip_reverts = 0
-
+			reverts = op.getReverts(rev["title"], hours=rule["hours"])
+			if not reverts:
+				continue
 			if len(reverts) >= rule["reverts_required"]:
 				for revert in reverts:
 					if revert["reverter"] != revert["victim"]:
