@@ -56,7 +56,7 @@ class Executor:
 				if expiry and final_expiry < expiry:
 					final_expiry = expiry
 			except KeyboardInterrupt:
-				print("terminating yuno...")
+				logger.info("terminating stabilizer...")
 				sys.exit(0)
 
 			except:

@@ -125,7 +125,6 @@ class MWAPI:
 			session.post(params)
 		except:
 			logger.error("failed to stabilize check crasreport for details")
-			print(traceback.format_exc())
 			logger.critical(traceback.format_exc())
 			return False
 

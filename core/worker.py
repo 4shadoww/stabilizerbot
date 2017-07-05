@@ -140,7 +140,7 @@ class Worker:
 								stabilizer.start()
 
 		except KeyboardInterrupt:
-			print("terminating stabilizer...")
+			logger.info("terminating stabilizer...")
 			self.killer.kill = True
 			self.cf_updater.join()
 		except:

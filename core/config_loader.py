@@ -6,6 +6,8 @@ import glob
 import os
 import logging
 
+logger = logging.getLogger("infolog")
+
 # Import core modules
 from core import path
 
@@ -16,15 +18,13 @@ try:
 	cur_conf["core"] = json.load(core_config_f)
 	core_config_f.close()
 except:
-	print("error: failed  to load core config")
-	print("failed to startup")
-	print(traceback.format_exc())
+	logger.critical("failed  to load core config")
+	logger.critical("failed to startup")
+	logger.critical(traceback.format_exc())
 	sys.exit(1)
 
 # Import core modules
 from core import yapi
-
-logger = logging.getLogger("infolog")
 
 cfg_ver = 0
 
