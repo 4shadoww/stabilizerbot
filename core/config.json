@@ -4,7 +4,7 @@
 	"api_path": "/w/api.php",
 	"rules": ["anonreverts", "ores", "abusefilters", "greylist"],
 	"ign_rules": [],
-	"test": false,
+	"test": true,
 	"required_score": 2,
 	"namespaces": [0],
 	"stream_url": "https://stream.wikimedia.org/v2/stream/recentchange",
