@@ -11,8 +11,6 @@
 	"config_mode": "online",
 	"online_conf_path": "Käyttäjä:VakauttajaBot/config.json",
 	"enable_log": false,
-	"log_warnings": false,
-	"status_log": true,
 	"log_decision": "positive",
 	"s_delay": 300
 }

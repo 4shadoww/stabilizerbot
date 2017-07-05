@@ -51,9 +51,7 @@ Full explanion of config.json
 	"stream_url": "https://stream.wikimedia.org/v2/stream/recentchange", <- Recent changes stream url
 	"config_mode": "online", <- Will config loaded from local files or from wiki page (online / offline)
 	"online_conf_path": "Käyttäjä:VakauttajaBot/config.json", <- Wiki page path (online config)
-	"enable_log": false, <- Enable log
-	"status_log": true, <- Status log
-	"status_lps": 10, <- Status logs per seconds
+	"enable_log": false, <- Enable log (errors will be always logged)
 	"log_decision": "positive", <- Log decisions (positive / negative / both)
 	"s_delay": 300 <- Seconds to wait before stabilization
 }

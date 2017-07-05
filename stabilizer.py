@@ -13,6 +13,7 @@ from core import path
 sys.path.append(path.main()+"core/lib/")
 
 # Import core modules
+from core import config_loader as cfgl
 from core import worker
 from core import session
 
@@ -35,23 +36,23 @@ def setupLogging():
 	ch.setFormatter(formatter)
 	ch.addFilter(LessThanFilter(logging.ERROR))
 	ch.setLevel(logging.DEBUG)
+	logger.addHandler(ch)
 	# Error stream
 	eh = logging.StreamHandler(sys.stderr)
 	eh.setLevel(logging.ERROR)
 	eh.setFormatter(formatter)
+	logger.addHandler(eh)
 	# Info log
-	il = logging.FileHandler(path.main()+"logs/info.log")
-	il.setLevel(logging.DEBUG)
-	il.addFilter(LessThanFilter(logging.ERROR))
-	il.setFormatter(formatter)
+	if cfgl.cur_conf["core"]["enable_log"]:
+		il = logging.FileHandler(path.main()+"logs/info.log")
+		il.setLevel(logging.DEBUG)
+		il.addFilter(LessThanFilter(logging.ERROR))
+		il.setFormatter(formatter)
+		logger.addHandler(il)
 	# Error log
 	el = logging.FileHandler(path.main()+"logs/crashreport.log")
 	el.setLevel(logging.ERROR)
 	el.setFormatter(formatter)
-	# Add handlers
-	logger.addHandler(ch)
-	logger.addHandler(eh)
-	logger.addHandler(il)
 	logger.addHandler(el)
 
 	# Stable logger
