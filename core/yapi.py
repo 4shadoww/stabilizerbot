@@ -118,7 +118,7 @@ class MWAPI:
 			"reason": reason,
 			"default": "stable",
 			"expiry": expiry,
-			"token": MWAPI.getToken("csrf")["csrftoken"]
+			"token": MWAPI.getToken(["csrf"])["csrftoken"]
 		}
 
 		try:
