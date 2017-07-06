@@ -90,7 +90,7 @@ class Stabilizer(Thread):
 			dtexpiry = datetime.datetime.utcnow() + datetime.timedelta(hours=self.expiry, minutes=0, seconds=0)
 			# Set reason
 			revlink = "[[Special:Diff/"+str(self.rev["revision"]["new"])+"|"+str(self.rev["revision"]["new"])+"]]"
-			reason = self.dictionary[cfgl.cur_conf["core"]["lang"]]["reasons"]["YV1"] % revlink
+			reason = dictionary[cfgl.cur_conf["core"]["lang"]]["reasons"]["YV1"] % revlink
 
 			# Stabilize
 			api.stabilize(self.rev["title"], reason, expiry=timelib.toString(dtexpiry))
