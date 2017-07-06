@@ -2,11 +2,12 @@
 import datetime
 import time
 import json
-from sseclient import SSEClient as EventSource
 from threading import Thread
 import sys
 import traceback
 import logging
+
+from sseclient import SSEClient as EventSource
 
 # Import core modules
 from core import config_loader as cfgl
@@ -17,6 +18,9 @@ from core import timelib
 
 api = yapi.MWAPI
 logger = logging.getLogger("infolog")
+
+f_dict = open(path.main()+"core/dict.json")
+dictionary = json.load(f_dict)
 
 def shouldCheck(rev):
 	# Check should revision to be checked at all
@@ -73,8 +77,6 @@ class ConfigUpdate(Thread):
 class Stabilizer(Thread):
 
 	killer = None
-	f = open(path.main()+"core/dict.json")
-	dictionary = json.load(f)
 
 	def __init__(self, killer, rev, expiry):
 		self.killer = killer
@@ -83,16 +85,19 @@ class Stabilizer(Thread):
 		super(Stabilizer, self).__init__()
 
 	def stabilize(self):
-		# Calculate expiry
-		dtexpiry = datetime.datetime.utcnow() + datetime.timedelta(hours=self.expiry, minutes=0, seconds=0)
-		# Set reason
-		revlink = "[[Special:Diff/"+str(self.rev["revision"]["new"])+"|"+str(self.rev["revision"]["new"])+"]]"
-		reason = self.dictionary[cfgl.cur_conf["core"]["lang"]]["reasons"]["YV1"] % revlink
+		if not cfgl.cur_conf["core"]["test"] and not cfgl.cur_conf["core"]["test"]:
+			# Calculate expiry
+			dtexpiry = datetime.datetime.utcnow() + datetime.timedelta(hours=self.expiry, minutes=0, seconds=0)
+			# Set reason
+			revlink = "[[Special:Diff/"+str(self.rev["revision"]["new"])+"|"+str(self.rev["revision"]["new"])+"]]"
+			reason = self.dictionary[cfgl.cur_conf["core"]["lang"]]["reasons"]["YV1"] % revlink
 
-		# Stabilize
-		api.stabilize(self.rev["title"], reason, expiry=timelib.toString(dtexpiry))
+			# Stabilize
+			api.stabilize(self.rev["title"], reason, expiry=timelib.toString(dtexpiry))
 
-		return True
+			return True
+
+		return False
 
 	def run(self):
 		times = 0
