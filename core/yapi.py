@@ -13,6 +13,10 @@ from core.config_loader import cur_conf
 logger = logging.getLogger("infolog")
 
 def parameterMaker(values):
+
+	if type(values) != list:
+		return values
+
 	final_str = ""
 	for i in range(len(values)):
 		final_str += str(values[i])
