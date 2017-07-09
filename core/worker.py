@@ -78,8 +78,9 @@ class Stabilizer(Thread):
 
 	killer = None
 
-	def __init__(self, killer, rev, expiry):
+	def __init__(self, killer, pending, rev, expiry):
 		self.killer = killer
+		self.pending = pending
 		self.rev = rev
 		self.expiry = expiry
 		super(Stabilizer, self).__init__()
@@ -108,6 +109,7 @@ class Stabilizer(Thread):
 			times += 0.5
 
 		if shouldCheck(self.rev):
+			self.pending.remove(self.rev["title"])
 			self.stabilize()
 		return True
 
@@ -115,8 +117,10 @@ class Worker:
 	r_exec = None
 	killer = None
 	cf_updater = None
+	pending = []
 
 	def __init__(self):
+		self.pending = []
 		self.r_exec = rule_executor.Executor()
 		# Init ConfigUpdater
 		self.killer = Killer()
@@ -137,11 +141,12 @@ class Worker:
 
 					if change["wiki"] == wiki and change["type"] == "edit" and change["namespace"] in cfgl.cur_conf["core"]["namespaces"]:
 						# Check should revision to be checked at all
-						if shouldCheck(change):
+						if shouldCheck(change) and change["title"] not in self.pending:
 							expiry = self.r_exec.shouldStabilize(change)
-							if expiry and not cfgl.cur_conf["core"]["test"]:
+							if expiry and not cfgl.cur_conf["core"]["test"] and change["title"] not in self.pending:
 								#self.stabilize(change, expiry)
-								stabilizer = Stabilizer(self.killer, change, expiry)
+								self.pending.append(change["title"])
+								stabilizer = Stabilizer(self.killer, self.pending, change, expiry)
 								stabilizer.start()
 
 		except KeyboardInterrupt:
