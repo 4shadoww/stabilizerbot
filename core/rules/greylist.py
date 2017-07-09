@@ -11,6 +11,7 @@ class YunoModule:
 	api = yapi.MWAPI
 	config = {
 		"expiry": 24,
+		"score": 1,
 		"list_path": "Käyttäjä:VakauttajaBot/greylist.json"
 	}
 	greylist = None
@@ -29,9 +30,10 @@ class YunoModule:
 			self.greylist = json.loads(self.api.getText(self.config["list_path"]))
 			self.list_ver = lastrev
 
-		for user in self.greylist:
-			if user == rev["user"] and self.greylist[user] > score:
-				score = self.greylist[user]
+		for user in self.greylist["values"]:
+			if user == rev["user"]:
+				score = self.config["score"]
 				expiry = self.config["expiry"]
+				break
 
 		return score, expiry

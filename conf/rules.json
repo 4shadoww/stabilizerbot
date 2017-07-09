@@ -54,6 +54,7 @@
 	},
 	"greylist": {
 			"list_path": "Käyttäjä:VakauttajaBot/greylist.json",
+			"score": 1,
 			"expiry": 24
 	}
 }
