@@ -32,7 +32,7 @@ def shouldCheck(rev):
 	if api.stabilized(rev["title"]):
 		return False
 
-	if not api.reviewed:
+	if not api.reviewed(rev["title"]):
 		return False
 
 	return True

@@ -100,10 +100,12 @@ class MWAPI:
 		answer = query["query"]["pages"]
 
 		for pageid in answer:
-			if "flagged" in answer[pageid] and "stable_revid" in answer[pageid]["flagged"]:
+			if ("flagged" in answer[pageid] and "stable_revid" in answer[pageid]["flagged"]
+			and answer[pageid]["flagged"]["stable_revid"] != "" and answer[pageid]["flagged"]["stable_revid"] != None
+			and type(answer[pageid]["flagged"]["stable_revid"]) is int):
 				return True
-			else:
-				return False
+
+			return False
 
 		return False
 
