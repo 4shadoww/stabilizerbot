@@ -28,7 +28,13 @@ class YunoModule:
 			if len(reverts) >= rule["reverts_required"]:
 				for revert in reverts:
 					if revert["reverter"] != revert["victim"]:
-						if all(i not in api.getUserRights(revert["victim"]) for i in rule["groups"]) or all(i not in api.getUserRights(revert["reverter"]) for i in rule["groups"]):
+						victim_groups = api.getUserRights(revert["victim"])
+						reverter_groups = api.getUserRights(revert["reverter"])
+						
+						if not victim_groups or not reverter_groups:
+							continue
+
+						if all(i not in victim_groups for i in rule["groups"]) or all(i not in reverter_groups for i in rule["groups"]):
 							ip_reverts += 1
 
 		if ip_reverts >= rule["reverts_required"]:
