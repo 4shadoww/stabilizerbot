@@ -56,5 +56,15 @@
 			"list_path": "Käyttäjä:VakauttajaBot/greylist.json",
 			"score": 1,
 			"expiry": 24
+	},
+	"pagelist": {
+			"list_path": "Käyttäjä:VakauttajaBot/greylist.json",
+			"score": 1,
+			"expiry": 24
+	},
+	"ipspace": {
+			"list_path": "Käyttäjä:VakauttajaBot/greylist.json",
+			"score": 1,
+			"expiry": 24
 	}
 }
