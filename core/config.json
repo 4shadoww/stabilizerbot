@@ -2,7 +2,7 @@
 	"lang": "fi",
 	"site": "https://fi.wikipedia.org",
 	"api_path": "/w/api.php",
-	"rules": ["anonreverts", "ores", "abusefilters", "greylist"],
+	"rules": ["anonreverts", "ores", "abusefilters", "greylist", "pagelist", "ipspace"],
 	"ign_rules": [],
 	"test": false,
 	"required_score": 2,
