@@ -7,13 +7,15 @@ class YunoModule:
 
 	name = "greylist"
 	cfg_ver = None
-	list_ver = None
-	api = yapi.MWAPI
+
 	config = {
 		"expiry": 24,
 		"score": 1,
 		"list_path": "Käyttäjä:VakauttajaBot/greylist.json"
 	}
+	
+	list_ver = None
+	api = yapi.MWAPI
 	greylist = None
 
 	def run(self, rev):
