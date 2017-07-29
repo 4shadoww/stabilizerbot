@@ -16,13 +16,15 @@ slogger = logging.getLogger("stablelog")
 class Executor:
 	rules = []
 	last_rules = None
+	last_ign = None
 
 	# Load rules that are listed in config.json at core or in online config
 	def loadRules(self):
-		if self.last_rules != config_loader.cur_conf["core"]["rules"]:
+		if self.last_rules != config_loader.cur_conf["core"]["rules"] or self.last_ign != config_loader.cur_conf["core"]["ign_rules"]:
 			self.rules = []
 			logger.info("loading rules")
 			self.last_rules = config_loader.cur_conf["core"]["rules"]
+			self.last_ign = config_loader.cur_conf["core"]["ign_rules"]
 			for rule in config_loader.cur_conf["core"]["rules"]:
 				if rule not in config_loader.cur_conf["core"]["ign_rules"]:
 					try:
