@@ -35,7 +35,7 @@ def updateConfigItems(holder, new):
 def updateConfig(holder, new):
 	for item in new:
 		if item == "core":
-			updateConfigItems(holder["core"], new)
+			updateConfigItems(holder["core"], new[item])
 		else:
 			holder[item] = new[item]
 
