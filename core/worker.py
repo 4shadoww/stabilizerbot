@@ -118,6 +118,7 @@ class Worker:
 	killer = None
 	cf_updater = None
 	pending = []
+	tries = 0
 
 	def __init__(self):
 		self.pending = []
@@ -126,6 +127,7 @@ class Worker:
 		self.killer = Killer()
 		self.cf_updater = ConfigUpdate(self.killer)
 		self.cf_updater.start()
+		tries = 0
 
 	def run(self):
 		try:
@@ -140,6 +142,8 @@ class Worker:
 						continue
 
 					if change["wiki"] == wiki and change["type"] == "edit" and change["namespace"] in cfgl.cur_conf["core"]["namespaces"]:
+						if self.tries != 0:
+							self.tries = 0
 						# Check should revision to be checked at all
 						if shouldCheck(change) and change["title"] not in self.pending:
 							expiry = self.r_exec.shouldStabilize(change)
@@ -153,6 +157,13 @@ class Worker:
 			logger.info("terminating stabilizer...")
 			self.killer.kill = True
 			self.cf_updater.join()
+		except ConnectionResetError:
+			if self.tries == 5:
+				logger.error("giving up")
+				sys.exit(1)
+			logger.error("error: connection error\n trying to reconnect...")
+			self.tries += 1
+			self.run()
 		except:
 			logger.error("error: faced unexcepted error check crash report")
 			logger.critical(traceback.format_exc())
