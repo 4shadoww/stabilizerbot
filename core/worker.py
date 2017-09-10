@@ -86,6 +86,9 @@ class Stabilizer(Thread):
 		super(Stabilizer, self).__init__()
 
 	def stabilize(self):
+		if not cfgl.cur_conf["core"]["reverted"] and api.isReverted(self.rev["title"], self.rev["revision"]["new"]):
+			return False
+
 		if not cfgl.cur_conf["core"]["test"] and not cfgl.cur_conf["core"]["test"]:
 			# Calculate expiry
 			dtexpiry = datetime.datetime.utcnow() + datetime.timedelta(hours=self.expiry, minutes=0, seconds=0)

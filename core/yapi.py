@@ -13,7 +13,6 @@ from core.config_loader import cur_conf
 logger = logging.getLogger("infolog")
 
 def parameterMaker(values):
-
 	if type(values) != list:
 		return values
 
@@ -171,6 +170,23 @@ class MWAPI:
 
 		return False
 
+	def getTextById(revid):
+		params = {
+			"action": "query",
+			"prop": "revisions",
+			"revids": revid,
+			"rvprop": "content"
+		}
+		query = session.get(params)["query"]["pages"]
+		for pageid in query:
+			if pageid == "-1":
+				return False
+			if "revisions" not in query[pageid]:
+				return False
+			return query[pageid]["revisions"][0]["*"]
+
+		return False
+
 	def getPageHistory(title, **kwargs):
 		params = {
 			"action": "query",
@@ -203,5 +219,31 @@ class MWAPI:
 
 		if "groups" in query["query"]["users"][0]:
 			return query["query"]["users"][0]["groups"]
+
+		return False
+
+	def isReverted(title, revid):
+		pick = False
+
+		revisions = MWAPI.getPageHistory(title, rvprop="ids", rvlimit=10)
+		for rev in revisions:
+			if rev["revid"] == revid:
+				return False
+			text0 = MWAPI.getTextById(rev["revid"])
+			if not text0:
+				continue
+
+			for drev in revisions:
+				if drev["revid"] == revid:
+					pick = True
+					continue
+				if not pick:
+					continue
+				text1 = MWAPI.getTextById(drev["revid"])
+
+				if text1 == text0:
+					return True
+
+			pick = False
 
 		return False
