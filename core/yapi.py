@@ -153,6 +153,25 @@ class MWAPI:
 
 		return False
 
+	def getSha1(revid):
+		params = {
+			"action": "query",
+			"prop": "revisions",
+			"revids": revid,
+			"rvprop": "sha1",
+			"format": "json"
+		}
+		query = session.get(params)["query"]["pages"]
+
+		for pageid in query:
+			if pageid == "-1":
+				return False
+			if "revisions" not in query[pageid]:
+				return False
+			return query[pageid]["revisions"][0]["sha1"]
+
+		return False
+
 	def getText(title):
 		params = {
 			"action": "query",
@@ -229,8 +248,8 @@ class MWAPI:
 		for rev in revisions:
 			if rev["revid"] == revid:
 				return False
-			text0 = MWAPI.getTextById(rev["revid"])
-			if not text0:
+			sha10 = MWAPI.getSha1(rev["revid"])
+			if not sha10:
 				continue
 
 			for drev in revisions:
@@ -239,9 +258,9 @@ class MWAPI:
 					continue
 				if not pick:
 					continue
-				text1 = MWAPI.getTextById(drev["revid"])
+				sha11 = MWAPI.getSha1(rev["revid"])
 
-				if text1 == text0:
+				if sha10 == sha11:
 					return True
 
 			pick = False
