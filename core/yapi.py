@@ -76,8 +76,10 @@ class MWAPI:
 			"format": "json"
 		}
 
-
-		query = session.get(params)
+		try:
+			query = session.get(params)
+		except ValueError:
+			return False
 		answer = query["query"]["pages"]
 
 		for pageid in answer:
