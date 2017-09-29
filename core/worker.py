@@ -163,6 +163,8 @@ class Worker:
 		except ConnectionResetError:
 			if self.tries == 5:
 				logger.error("giving up")
+				self.killer.kill = True
+				self.cf_updater.join()
 				sys.exit(1)
 			logger.error("error: connection error\n trying to reconnect...")
 			self.tries += 1
@@ -171,4 +173,6 @@ class Worker:
 			logger.error("error: faced unexcepted error check crash report")
 			logger.critical(traceback.format_exc())
 			logger.info("terminating threads")
+			self.killer.kill = True
+			self.cf_updater.join()
 			sys.exit(1)
