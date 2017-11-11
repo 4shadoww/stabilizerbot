@@ -26,9 +26,9 @@ def parameterMaker(values):
 	return final_str
 
 class ORES:
-	base_url = "https://ores.wikimedia.org/scores/"+cur_conf["core"]["lang"]+"wiki?"
+	base_url = "https://ores.wikimedia.org/v3/scores/"+cur_conf["core"]["lang"]+"wiki?"
 
-	def getScore(revids, models=["reverted", "goodfaith", "damaging"]):
+	def getScore(revids, models=["goodfaith", "damaging"]):
 		params = {
 			"revids": parameterMaker(revids),
 			"models": parameterMaker(models)

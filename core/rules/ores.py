@@ -1,6 +1,8 @@
 from core.rule_core import *
 from core import yapi
 
+from core.config_loader import cur_conf
+
 class YunoModule:
 
 	name = "ores"
@@ -29,11 +31,11 @@ class YunoModule:
 		# Check result and check for errors
 		# If error faced then try again once
 		for i in reversed(range(tries)):
-			scores = self.ores_api.getScore([rev["revision"]["new"]])
+			scores = self.ores_api.getScore([rev["revision"]["new"]])[cur_conf["core"]["lang"]+"wiki"]["scores"]
 			revid_data = scores[str(rev["revision"]["new"])]
 
 			for item in revid_data:
-				if "error" in revid_data[item] and "probability" not in revid_data[item]:
+				if "error" in revid_data[item] and "scores" not in revid_data[item]:
 					if i <= 0:
 						logger.error("failed to fetch ores revision data: %s" % str(revid_data))
 						return False
@@ -59,16 +61,16 @@ class YunoModule:
 					break
 
 				for value in rule["models"][item]:
-					if value == "max_false" and rule["models"][item][value] < revid_data[item]["probability"]["false"]:
+					if value == "max_false" and rule["models"][item][value] < revid_data[item]["score"]["probability"]["false"]:
 						failed = True
 						break
-					elif value == "min_false" and rule["models"][item][value] > revid_data[item]["probability"]["false"]:
+					elif value == "min_false" and rule["models"][item][value] > revid_data[item]["score"]["probability"]["false"]:
 						failed = True
 						break
-					elif value == "max_true" and rule["models"][item][value] < revid_data[item]["probability"]["true"]:
+					elif value == "max_true" and rule["models"][item][value] < revid_data[item]["score"]["probability"]["true"]:
 						failed = True
 						break
-					elif value == "min_true" and rule["models"][item][value] > revid_data[item]["probability"]["true"]:
+					elif value == "min_true" and rule["models"][item][value] > revid_data[item]["score"]["probability"]["true"]:
 						failed = True
 						break
 
