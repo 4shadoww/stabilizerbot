@@ -4,3 +4,5 @@ logs/*
 !logs/.gitkeep
 test.py
 .cache/
+core/config.json
+conf/rules.json

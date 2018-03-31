@@ -19,9 +19,6 @@ from core import timelib
 api = yapi.MWAPI
 logger = logging.getLogger("infolog")
 
-f_dict = open(path.main()+"core/dict.json")
-dictionary = json.load(f_dict)
-
 def shouldCheck(rev):
 	# Check should revision to be checked at all
 	revs = api.getRevision([rev["revision"]["new"]])
@@ -94,7 +91,7 @@ class Stabilizer(Thread):
 			dtexpiry = datetime.datetime.utcnow() + datetime.timedelta(hours=self.expiry, minutes=0, seconds=0)
 			# Set reason
 			revlink = "[[Special:Diff/"+str(self.rev["revision"]["new"])+"|"+str(self.rev["revision"]["new"])+"]]"
-			reason = dictionary[cfgl.cur_conf["core"]["lang"]]["reasons"]["YV1"] % revlink
+			reason = cfgl.dictionary[cfgl.cur_conf["core"]["lang"]]["reasons"]["YV1"] % revlink
 
 			# Stabilize
 			api.stabilize(self.rev["title"], reason, expiry=timelib.toString(dtexpiry))

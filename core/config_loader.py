@@ -11,6 +11,33 @@ logger = logging.getLogger("infolog")
 # Import core modules
 from core import path
 
+# Load dict
+f_dict = open(path.main()+"core/dict.json")
+dictionary = json.load(f_dict)
+
+# Generate new config
+def createNewConfig():
+	default_config = """{
+	"lang": "fi",
+	"site": "https://fi.wikipedia.org",
+	"api_path": "/w/api.php",
+	"rules": ["anonreverts", "ores", "abusefilters", "greylist", "pagelist", "ipspace", "adminaction"],
+	"ign_rules": [],
+	"test": false,
+	"required_score": 2,
+	"namespaces": [0],
+	"stream_url": "https://stream.wikimedia.org/v2/stream/recentchange",
+	"config_mode": "online",
+	"online_conf_path": "Käyttäjä:VakauttajaBot/config.json",
+	"enable_log": false,
+	"log_decision": "positive",
+	"s_delay": 300,
+	"reverted": false
+}
+"""
+	core_config_f = open(path.main()+"core/config.json", "w")
+	core_config_f.write(default_config)
+
 # Load core config for startup
 cur_conf = {}
 try:
@@ -18,8 +45,10 @@ try:
 	cur_conf["core"] = json.load(core_config_f)
 	core_config_f.close()
 except:
-	logger.critical("failed  to load core config")
+	logger.critical("failed to load core config")
 	logger.critical("failed to startup")
+	logger.info("generaing new config")
+	createNewConfig()
 	logger.critical(traceback.format_exc())
 	sys.exit(1)
 

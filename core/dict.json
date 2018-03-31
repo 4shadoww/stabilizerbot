@@ -2,6 +2,9 @@
 	"fi": {
 		"reasons": {
 			"YV1": "Botti vakautti artikkelin automaattisesti mahdollisesti haitallisen muutoksen %s takia."
+		},
+		"editsum": {
+			"LS": "Botti lisäsi artikkelin %s listaan."
 		}
 	}
 }

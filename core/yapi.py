@@ -268,3 +268,32 @@ class MWAPI:
 			pick = False
 
 		return False
+
+	def getStableLog(title, timestamp=None):
+		params = {
+			"action": "query",
+			"list": "logevents",
+			"letype": "stable",
+			"letitle": title
+		}
+		if timestamp:
+			query = session.get(params, leend=timestamp)
+			return query
+		else:
+			query = session.get(params)
+			return query
+
+		return False
+
+	def savePage(title, text, comment, minor=False):
+		params = {
+			"action": "edit",
+			"title": title,
+			"text": text,
+			"summary": comment,
+			"minor": minor,
+			"bot": True,
+			"token": MWAPI.getToken(["csrf"])["csrftoken"]
+		}
+		session.post(params)
+		return True

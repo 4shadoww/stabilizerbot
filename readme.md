@@ -35,27 +35,7 @@ username = "myUsername"
 password = "myPassword"
 ```
 
-Core config is located at "core/config.json". From there set "lang" variable to match your language and do localization to "core/dict.json".
-
-Full explanion of config.json
-```
-{
-	"lang": "fi", <- Your language
-	"site": "https://fi.wikipedia.org", <- Site
-	"api_path": "/w/api.php",	<- Api path
-	"rules": ["anonreverts", "ores", "abusefilters", "greylist"], <- Rules that will be used
-	"ign_rules": [], <- Rules that will be ignored
-	"test": false, <- Test mode
-	"required_score": 2, <- Score that is required in order to do stabilization
-	"namespaces": [0], <- Namespaces
-	"stream_url": "https://stream.wikimedia.org/v2/stream/recentchange", <- Recent changes stream url
-	"config_mode": "online", <- Will config loaded from local files or from wiki page (online / offline)
-	"online_conf_path": "Käyttäjä:VakauttajaBot/config.json", <- Wiki page path (online config)
-	"enable_log": false, <- Enable log (errors will be always logged)
-	"log_decision": "positive", <- Log decisions (positive / negative / both)
-	"s_delay": 300 <- Seconds to wait before stabilization
-}
-```
+Core config will be created when bot will be runned first time to "core/config.json". Note on first run bot only creates the configuration file. From there set "lang" variable to match your language and do localization to "core/dict.json".
 
 ### Testing
 You can test bot safely without actually stabilizing articles by setting "test" option in "core/config.json" to "True".
