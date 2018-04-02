@@ -2,15 +2,15 @@ from core.rule_core import *
 
 class YunoModule:
 
-	name = "template"
-	cfg_ver = None
+    name = "template"
+    cfg_ver = None
 
-	config = {
+    config = {
 
-	}
+    }
 
-	def run(self, rev):
-		score = 0
-		expiry = None
+    def run(self, rev):
+        score = 0
+        expiry = None
 
-		return score, expiry
+        return score, expiry

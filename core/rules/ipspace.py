@@ -6,42 +6,42 @@ from core import yapi
 
 class YunoModule:
 
-	name = "ipspace"
-	cfg_ver = None
+    name = "ipspace"
+    cfg_ver = None
 
-	config = {
-		"expiry": 24,
-		"score": 1,
-		"list_path": "Käyttäjä:VakauttajaBot/greylist.json"
-	}
+    config = {
+        "expiry": 24,
+        "score": 1,
+        "list_path": "Käyttäjä:VakauttajaBot/greylist.json"
+    }
 
-	list_ver = None
-	api = yapi.MWAPI
-	greylist = None
+    list_ver = None
+    api = yapi.MWAPI
+    greylist = None
 
-	def run(self, rev):
-		score = 0
-		expiry = None
+    def run(self, rev):
+        score = 0
+        expiry = None
 
-		lastrev = self.api.getLatestRev(self.config["list_path"])
+        lastrev = self.api.getLatestRev(self.config["list_path"])
 
-		if not lastrev:
-			logger.critical("greylist not found")
-			return score, expiry
+        if not lastrev:
+            logger.critical("greylist not found")
+            return score, expiry
 
-		if lastrev != self.list_ver:
-			self.greylist = json.loads(self.api.getText(self.config["list_path"]))
-			self.list_ver = lastrev
+        if lastrev != self.list_ver:
+            self.greylist = json.loads(self.api.getText(self.config["list_path"]))
+            self.list_ver = lastrev
 
-		for address in self.greylist["values"]:
-			try:
-				user = ipaddress.ip_address(rev["user"])
-			except ValueError:
-				continue
+        for address in self.greylist["values"]:
+            try:
+                user = ipaddress.ip_address(rev["user"])
+            except ValueError:
+                continue
 
-			if user in ipaddress.ip_network(address):
-				score = self.config["score"]
-				expiry = self.config["expiry"]
-				break
+            if user in ipaddress.ip_network(address):
+                score = self.config["score"]
+                expiry = self.config["expiry"]
+                break
 
-		return score, expiry
+        return score, expiry
