@@ -246,23 +246,19 @@ class MWAPI:
     def isReverted(title, revid):
         pick = False
 
-        revisions = MWAPI.getPageHistory(title, rvprop="ids", rvlimit=10)
+        revisions = MWAPI.getPageHistory(title, rvprop="ids|sha1", rvlimit=10)
         for rev in revisions:
-            if rev["revid"] == revid:
+            if str(rev["revid"]) == str(revid):
                 return False
-            sha10 = MWAPI.getSha1(rev["revid"])
-            if not sha10:
-                continue
-
+           
             for drev in revisions:
-                if drev["revid"] == revid:
+                if str(drev["revid"]) == str(revid):
                     pick = True
                     continue
                 if not pick:
                     continue
-                sha11 = MWAPI.getSha1(rev["revid"])
-
-                if sha10 == sha11:
+               
+                if rev["sha1"] == drev["sha1"]:
                     return True
 
             pick = False
