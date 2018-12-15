@@ -142,7 +142,7 @@ class MWAPI:
             "action": "query",
             "prop": "revisions",
             "titles": title,
-            "rvprop": "ids"
+            "rvprop": "ids",
         }
         query = session.get(params)["query"]["pages"]
 
@@ -179,7 +179,8 @@ class MWAPI:
             "action": "query",
             "prop": "revisions",
             "titles": title,
-            "rvprop": "content"
+            "rvprop": "content",
+            "rvslots": "main"
         }
         query = session.get(params)["query"]["pages"]
         for pageid in query:
@@ -187,7 +188,7 @@ class MWAPI:
                 return False
             if "revisions" not in query[pageid]:
                 return False
-            return query[pageid]["revisions"][0]["*"]
+            return query[pageid]["revisions"][0]["slots"]["main"]["*"]
 
         return False
 
@@ -196,7 +197,8 @@ class MWAPI:
             "action": "query",
             "prop": "revisions",
             "revids": revid,
-            "rvprop": "content"
+            "rvprop": "content",
+            "rvslots": "main"
         }
         query = session.get(params)["query"]["pages"]
         for pageid in query:
@@ -204,7 +206,7 @@ class MWAPI:
                 return False
             if "revisions" not in query[pageid]:
                 return False
-            return query[pageid]["revisions"][0]["*"]
+            return query[pageid]["revisions"][0]["slots"]["main"]["*"]
 
         return False
 
@@ -213,7 +215,8 @@ class MWAPI:
             "action": "query",
             "prop": "revisions",
             "titles": title,
-            "rvprop": "ids|timestamp|flags|comment|user"
+            "rvprop": "ids|timestamp|flags|comment|user",
+            "rvslots": "main"
         }
         for key, val in kwargs.items():
             params[key] = val
@@ -246,23 +249,19 @@ class MWAPI:
     def isReverted(title, revid):
         pick = False
 
-        revisions = MWAPI.getPageHistory(title, rvprop="ids", rvlimit=10)
+        revisions = MWAPI.getPageHistory(title, rvprop="ids|sha1", rvlimit=10)
         for rev in revisions:
-            if rev["revid"] == revid:
+            if str(rev["revid"]) == str(revid):
                 return False
-            sha10 = MWAPI.getSha1(rev["revid"])
-            if not sha10:
-                continue
-
+           
             for drev in revisions:
-                if drev["revid"] == revid:
+                if str(drev["revid"]) == str(revid):
                     pick = True
                     continue
                 if not pick:
                     continue
-                sha11 = MWAPI.getSha1(rev["revid"])
-
-                if sha10 == sha11:
+               
+                if rev["sha1"] == drev["sha1"]:
                     return True
 
             pick = False

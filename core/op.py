@@ -20,7 +20,7 @@ def getReverts(title, hours=1):
 
     for i in range(len(edits)):
         for x in range(i+1, len(edits)):
-            if edits[i]["*"] == edits[x]["*"]:
+            if edits[i]["slots"]["main"]["*"] == edits[x]["slots"]["main"]["*"]:
                 revert = {"reverter": edits[i]["user"], "victim": edits[i+1]["user"], "revid": edits[i]["revid"], "oldrevid": edits[i+1]["revid"]}
                 reverts.append(revert)
                 break
