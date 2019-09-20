@@ -9,6 +9,7 @@ List of currently supported rules:
 * Anonreverts
 * Abusefilters
 * Greylist
+* Whitelist
 * ORES
 
 ### Installing
