@@ -9,9 +9,6 @@ import logging
 # Import path tool
 from core import path
 
-# Append lib path
-sys.path.append(path.main()+"core/lib/")
-
 # Import core modules
 from core import config_loader as cfgl
 from core import worker
