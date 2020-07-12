@@ -20,10 +20,16 @@ api = yapi.MWAPI
 logger = logging.getLogger("infolog")
 
 def shouldCheck(rev):
+    delta = datetime.timedelta(hours=1)
+
     # Check should revision to be checked at all
     revs = api.getRevision([rev["revision"]["new"]])
 
     if "badrevids" in revs["query"]:
+        return False
+
+    # Skip change if it's too old. Eventstream does seem to stream sometimes even months old revisions for some reason?
+    if datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(rev["timestamp"]) > delta:
         return False
 
     if api.stabilized(rev["title"]):
