@@ -5,4 +5,6 @@ logs/*
 test.py
 .cache/
 core/config.json
+config.json
 conf/rules.json
+virtual-env/
