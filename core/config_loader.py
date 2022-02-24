@@ -11,6 +11,9 @@ logger = logging.getLogger("infolog")
 # Import core modules
 from core import path
 
+# Config location
+config_file_loc = path.main()+"core/config.json"
+
 # Load dict
 f_dict = open(path.main()+"core/dict.json")
 dictionary = json.load(f_dict)
@@ -35,13 +38,13 @@ def createNewConfig():
     "reverted": false
 }
 """
-    core_config_f = open(path.main()+"core/config.json", "w")
+    core_config_f = open(config_file_loc, "w")
     core_config_f.write(default_config)
 
 # Load core config for startup
 cur_conf = {}
 try:
-    core_config_f = open(path.main()+"core/config.json", "r")
+    core_config_f = open(config_file_loc, "r")
     cur_conf["core"] = json.load(core_config_f)
     core_config_f.close()
 except:
