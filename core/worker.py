@@ -2,7 +2,7 @@
 import datetime
 import time
 import json
-from threading import Thread
+import threading
 import sys
 import traceback
 import logging
@@ -19,6 +19,9 @@ from core import timelib
 api = yapi.MWAPI
 logger = logging.getLogger("infolog")
 
+lock = threading.Lock()
+pending = []
+
 def shouldCheck(rev):
     delta = datetime.timedelta(hours=1)
 
@@ -32,10 +35,14 @@ def shouldCheck(rev):
     if datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(rev["timestamp"]) > delta:
         return False
 
+    # TODO Create one function which does all of this with one api call
     if api.stabilized(rev["title"]):
         return False
 
     if not api.reviewed(rev["title"]):
+        return False
+
+    if api.latest_reviewed(rev['title']):
         return False
 
     return True
@@ -45,7 +52,7 @@ class Killer:
     kill = False
 
 # Updates config when changed every 30 seconds
-class ConfigUpdate(Thread):
+class ConfigUpdate(threading.Thread):
 
     killer = None
 
@@ -77,13 +84,12 @@ class ConfigUpdate(Thread):
             time.sleep(0.5)
             times += 0.5
 
-class Stabilizer(Thread):
+class Stabilizer(threading.Thread):
 
     killer = None
 
-    def __init__(self, killer, pending, rev, expiry):
+    def __init__(self, killer, rev, expiry):
         self.killer = killer
-        self.pending = pending
         self.rev = rev
         self.expiry = expiry
         super(Stabilizer, self).__init__()
@@ -115,7 +121,9 @@ class Stabilizer(Thread):
             times += 0.5
 
         if shouldCheck(self.rev):
-            self.pending.remove(self.rev["title"])
+            lock.acquire()
+            pending.remove(self.rev["title"])
+            lock.release()
             self.stabilize()
         return True
 
@@ -123,11 +131,9 @@ class Worker:
     r_exec = None
     killer = None
     cf_updater = None
-    pending = []
     tries = 0
 
     def __init__(self):
-        self.pending = []
         self.r_exec = rule_executor.Executor()
         # Init ConfigUpdater
         self.killer = Killer()
@@ -151,12 +157,13 @@ class Worker:
                         if self.tries != 0:
                             self.tries = 0
                         # Check should revision to be checked at all
-                        if shouldCheck(change) and change["title"] not in self.pending:
+                        if shouldCheck(change) and change["title"] not in pending:
                             expiry = self.r_exec.shouldStabilize(change)
-                            if expiry and not cfgl.cur_conf["core"]["test"] and change["title"] not in self.pending:
-                                #self.stabilize(change, expiry)
-                                self.pending.append(change["title"])
-                                stabilizer = Stabilizer(self.killer, self.pending, change, expiry)
+                            if expiry and not cfgl.cur_conf["core"]["test"] and change["title"] not in pending:
+                                lock.acquire()
+                                pending.append(change["title"])
+                                lock.release()
+                                stabilizer = Stabilizer(self.killer, change, expiry)
                                 stabilizer.start()
 
         except KeyboardInterrupt:

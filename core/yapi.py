@@ -28,7 +28,9 @@ def parameterMaker(values):
 class ORES:
     base_url = "https://ores.wikimedia.org/v3/scores/"+cur_conf["core"]["lang"]+"wiki?"
 
-    def getScore(revids, models=["goodfaith", "damaging"]):
+    def getScore(revids, models=None):
+        if not models:
+            models = ["goodfaith", "damaging"]
         params = {
             "revids": parameterMaker(revids),
             "models": parameterMaker(models)
@@ -43,7 +45,11 @@ class ORES:
         except AttributeError:
             return False
 class MWAPI:
-    def getRevision(revids, param=["ids", "timestamp", "flags", "user"]):
+    # TODO api calls could be sent as batches
+    # to make responses faster and save resources on api
+    def getRevision(revids, param=None):
+        if not param:
+            param = ["ids", "timestamp", "flags", "user"]
         params = {
             "action": "query",
             "prop": "revisions",
@@ -54,7 +60,9 @@ class MWAPI:
 
         return session.get(params)
 
-    def getAbuseFiler(user, timestamp, filters, param=["ids", "user", "title", "action", "result", "timestamp", "hidden", "revid"]):
+    def getAbuseFiler(user, timestamp, filters, param=None):
+        if not param:
+            param = ["ids", "user", "title", "action", "result", "timestamp", "hidden", "revid"]
         params = {
             "action": "query",
             "list": "abuselog",
@@ -104,6 +112,31 @@ class MWAPI:
             if ("flagged" in answer[pageid] and "stable_revid" in answer[pageid]["flagged"]
             and answer[pageid]["flagged"]["stable_revid"] != "" and answer[pageid]["flagged"]["stable_revid"] != None
             and type(answer[pageid]["flagged"]["stable_revid"]) is int):
+                return True
+
+            return False
+
+        return False
+
+    def latest_reviewed(title):
+        params = {
+            "action": "query",
+            "prop": "flagged",
+            "titles": title,
+            "format": "json"
+        }
+
+        query = session.get(params)
+        answer = query["query"]["pages"]
+
+        for pageid in answer:
+            if ("flagged" in answer[pageid] and "stable_revid" in answer[pageid]["flagged"] and
+                "pending_since" in answer[pageid]["flagged"] and
+                answer[pageid]["flagged"]["stable_revid"] != "" and
+                answer[pageid]["flagged"]["stable_revid"] != None and
+                type(answer[pageid]["flagged"]["stable_revid"]) is int and
+                answer[pageid]["flagged"]["pending_since"] != ""):
+
                 return True
 
             return False
