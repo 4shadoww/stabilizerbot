@@ -3,7 +3,6 @@ import datetime
 import time
 import json
 import threading
-import sys
 import traceback
 import logging
 
