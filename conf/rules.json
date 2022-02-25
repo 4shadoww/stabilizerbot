@@ -67,8 +67,8 @@
         "score": 1,
         "expiry": 24
     },
-	"whitelist": {
-		"list_path": "Käyttäjä:VakauttajaBot/whitelist.js",
-		"score": -1
+    "whitelist": {
+        "list_path": "Käyttäjä:VakauttajaBot/whitelist.js",
+        "score": -1
     }
 }
