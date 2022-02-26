@@ -1,7 +1,7 @@
 import datetime
 
 from core.rule_core import *
-from core import yapi
+from core import yapi as api
 from core import timelib
 
 class RuleModule:
@@ -26,8 +26,6 @@ class RuleModule:
         ]
     }
 
-    api = yapi.MWAPI
-
     def run(self, rev):
         score = 0
         expiry = None
@@ -36,7 +34,7 @@ class RuleModule:
 
         time =  timelib.to_string(datetime.datetime.utcnow()-end)
 
-        result = self.api.get_abuse_filter(rev["user"], time, self.config["filters"])
+        result = api.get_abuse_filter(rev["user"], time, self.config["filters"])
 
         if "error" in result:
             logger.error("abusefilters error: %s" % result["error"]["code"])

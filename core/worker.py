@@ -12,11 +12,10 @@ from sseclient import SSEClient as EventSource
 # Import core modules
 from core import config_loader as cfgl
 from core import rule_executor
-from core import yapi
+from core import yapi as api
 from core import path
 from core import timelib
 
-api = yapi.MWAPI
 logger = logging.getLogger("infolog")
 
 lock = threading.Lock()
@@ -42,7 +41,8 @@ def should_check(rev):
     if not api.reviewed(rev["title"]):
         return False
 
-    if api.latest_reviewed(rev['title']):
+    print(api.latest_pending(rev["title"]))
+    if not api.latest_pending(rev["title"]):
         return False
 
     return True

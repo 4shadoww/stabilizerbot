@@ -56,7 +56,7 @@ except:
     sys.exit(1)
 
 # Import core modules
-from core import yapi
+from core import yapi as api
 
 cfg_ver = 0
 
@@ -95,7 +95,7 @@ def check_for_online_update():
     global cfg_ver
     global cur_conf
 
-    lastrev = yapi.MWAPI.get_latest_rev(cur_conf["core"]["online_conf_path"])
+    lastrev = api.get_latest_rev(cur_conf["core"]["online_conf_path"])
 
     if not lastrev:
         logger.error("config page \"%s\" doesn't exists" % cur_conf["core"]["online_conf_path"])
@@ -103,7 +103,7 @@ def check_for_online_update():
     if lastrev != cfg_ver:
         logger.info("found new online config: %s" % str(lastrev))
         cfg_ver = lastrev
-        conf = yapi.MWAPI.get_text(cur_conf["core"]["online_conf_path"])
+        conf = api.get_text(cur_conf["core"]["online_conf_path"])
         try:
             new = json.loads(conf)
         except:

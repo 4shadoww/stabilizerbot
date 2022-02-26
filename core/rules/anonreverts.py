@@ -1,8 +1,6 @@
 from core.rule_core import *
 from core import op
-from core import yapi
-
-api = yapi.MWAPI
+from core import yapi as api
 
 class RuleModule:
 

@@ -1,7 +1,7 @@
 import json
 
 from core.rule_core import *
-from core import yapi
+from core import yapi as api
 
 class RuleModule:
 
@@ -16,21 +16,20 @@ class RuleModule:
     }
 
     list_ver = None
-    api = yapi.MWAPI
     greylist = None
 
     def run(self, rev):
         score = 0
         expiry = None
 
-        lastrev = self.api.get_latest_rev(self.config["list_path"])
+        lastrev = api.get_latest_rev(self.config["list_path"])
 
         if not lastrev:
             logger.critical("greylist not found")
             return score, expiry
 
         if lastrev != self.list_ver:
-            self.greylist = json.loads(self.api.get_text(self.config["list_path"]))
+            self.greylist = json.loads(api.get_text(self.config["list_path"]))
             self.list_ver = lastrev
 
         for title in self.greylist["values"]:

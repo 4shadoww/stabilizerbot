@@ -12,6 +12,8 @@ from core.config_loader import cur_conf
 
 logger = logging.getLogger("infolog")
 
+ores_base_url = "https://ores.wikimedia.org/v3/scores/"+cur_conf["core"]["lang"]+"wiki?"
+
 def parameter_maker(values):
     if type(values) != list:
         return values
@@ -25,307 +27,306 @@ def parameter_maker(values):
 
     return final_str
 
-class ORES:
-    base_url = "https://ores.wikimedia.org/v3/scores/"+cur_conf["core"]["lang"]+"wiki?"
 
-    def get_score(revids, models=None):
-        if not models:
-            models = ["goodfaith", "damaging"]
+def get_score(revids, models=None):
+    if not models:
+        models = ["goodfaith", "damaging"]
         params = {
             "revids": parameter_maker(revids),
             "models": parameter_maker(models)
         }
 
-        request_url = ORES.base_url + urlencode(params)
+    request_url = ores_base_url + urlencode(params)
 
-        request = urlopen(request_url)
-        try:
-            request = request.read().decode('utf8')
-            return json.loads(request)
-        except AttributeError:
-            return False
-class MWAPI:
-    # TODO api calls could be sent as batches
-    # to make responses faster and save resources on api
-    def get_revision(revids, param=None):
-        if not param:
-            param = ["ids", "timestamp", "flags", "user"]
-        params = {
-            "action": "query",
-            "prop": "revisions",
-            "revids": parameter_maker(revids),
-            "rvprop": parameter_maker(param),
-            "format": "json"
-        }
-
-        return session.get(params)
-
-    def get_abuse_filter(user, timestamp, filters, param=None):
-        if not param:
-            param = ["ids", "user", "title", "action", "result", "timestamp", "hidden", "revid"]
-        params = {
-            "action": "query",
-            "list": "abuselog",
-            "aflfilter": parameter_maker(filters),
-            "aflprop": parameter_maker(param),
-            "afluser": user,
-            "afldir": "newer",
-            "aflstart": timestamp,
-            "format": "json"
-        }
-
-        return session.get(params)
-
-    def stabilized(title):
-        params = {
-            "action": "query",
-            "prop": "flagged",
-            "titles": title,
-            "format": "json"
-        }
-
-        try:
-            query = session.get(params)
-        except ValueError:
-            return False
-        answer = query["query"]["pages"]
-
-        for pageid in answer:
-            if "flagged" in answer[pageid] and "protection_level" in answer[pageid]["flagged"]:
-                return True
-            else:
-                return False
-
+    request = urlopen(request_url)
+    try:
+        request = request.read().decode('utf8')
+        return json.loads(request)
+    except AttributeError:
         return False
 
-    def reviewed(title):
-        params = {
-            "action": "query",
-            "prop": "flagged",
-            "titles": title,
-            "format": "json"
-        }
+
+# TODO api calls could be sent as batches
+# to make responses faster and save resources on api
+def get_revision(revids, param=None):
+    if not param:
+        param = ["ids", "timestamp", "flags", "user"]
+    params = {
+        "action": "query",
+        "prop": "revisions",
+        "revids": parameter_maker(revids),
+        "rvprop": parameter_maker(param),
+        "format": "json"
+    }
+
+    return session.get(params)
+
+def get_abuse_filter(user, timestamp, filters, param=None):
+    if not param:
+        param = ["ids", "user", "title", "action", "result", "timestamp", "hidden", "revid"]
+    params = {
+        "action": "query",
+        "list": "abuselog",
+        "aflfilter": parameter_maker(filters),
+        "aflprop": parameter_maker(param),
+        "afluser": user,
+        "afldir": "newer",
+        "aflstart": timestamp,
+        "format": "json"
+    }
+
+    return session.get(params)
+
+def stabilized(title):
+    params = {
+        "action": "query",
+        "prop": "flagged",
+        "titles": title,
+        "format": "json"
+    }
+
+    try:
         query = session.get(params)
-        answer = query["query"]["pages"]
+    except ValueError:
+        return False
+    answer = query["query"]["pages"]
 
-        for pageid in answer:
-            if ("flagged" in answer[pageid] and "stable_revid" in answer[pageid]["flagged"]
-            and answer[pageid]["flagged"]["stable_revid"] != "" and answer[pageid]["flagged"]["stable_revid"] != None
-            and type(answer[pageid]["flagged"]["stable_revid"]) is int):
+    for pageid in answer:
+        if "flagged" in answer[pageid] and "protection_level" in answer[pageid]["flagged"]:
+            return True
+        else:
+            return False
+
+    return False
+
+def reviewed(title):
+    params = {
+        "action": "query",
+        "prop": "flagged",
+        "titles": title,
+        "format": "json"
+    }
+    query = session.get(params)
+    answer = query["query"]["pages"]
+
+    for pageid in answer:
+        if ("flagged" in answer[pageid] and "stable_revid" in answer[pageid]["flagged"]
+        and answer[pageid]["flagged"]["stable_revid"] != "" and answer[pageid]["flagged"]["stable_revid"] != None
+        and type(answer[pageid]["flagged"]["stable_revid"]) is int):
+            return True
+
+        return False
+
+    return False
+
+def latest_pending(title):
+    params = {
+        "action": "query",
+        "prop": "flagged",
+        "titles": title,
+        "format": "json"
+    }
+
+    query = session.get(params)
+    answer = query["query"]["pages"]
+
+    for pageid in answer:
+        if ("flagged" in answer[pageid] and "stable_revid" in answer[pageid]["flagged"] and
+            "pending_since" in answer[pageid]["flagged"] and
+            answer[pageid]["flagged"]["stable_revid"] != "" and
+            answer[pageid]["flagged"]["stable_revid"] != None and
+            type(answer[pageid]["flagged"]["stable_revid"]) is int and
+            answer[pageid]["flagged"]["pending_since"] != ""):
+
+            return True
+
+        return False
+
+    return False
+
+def get_token(token_type):
+    params = {
+        "action": "query",
+        "meta": "tokens",
+        "type": parameter_maker(token_type)
+    }
+    return session.get(params)["query"]["tokens"]
+
+def stabilize(title, reason, expiry="infinite"):
+    params = {
+        "action": "stabilize",
+        "title": title,
+        "reason": reason,
+        "default": "stable",
+        "expiry": expiry,
+        "token": get_token(["csrf"])["csrftoken"]
+    }
+
+    try:
+        session.post(params)
+    except:
+        logger.error("failed to stabilize check crasreport for details")
+        logger.critical(traceback.format_exc())
+        return False
+
+    return True
+
+def get_latest_rev(title):
+    params = {
+        "action": "query",
+        "prop": "revisions",
+        "titles": title,
+        "rvprop": "ids",
+    }
+    query = session.get(params)["query"]["pages"]
+
+    for pageid in query:
+        if pageid == "-1":
+            return False
+        if "revisions" not in query[pageid]:
+            return False
+        return query[pageid]["revisions"][0]["revid"]
+
+    return False
+
+def get_sha1(revid):
+    params = {
+        "action": "query",
+        "prop": "revisions",
+        "revids": revid,
+        "rvprop": "sha1",
+        "format": "json"
+    }
+    query = session.get(params)["query"]["pages"]
+
+    for pageid in query:
+        if pageid == "-1":
+            return False
+        if "revisions" not in query[pageid]:
+            return False
+        return query[pageid]["revisions"][0]["sha1"]
+
+    return False
+
+def get_text(title):
+    params = {
+        "action": "query",
+        "prop": "revisions",
+        "titles": title,
+        "rvprop": "content",
+        "rvslots": "main"
+    }
+    query = session.get(params)["query"]["pages"]
+    for pageid in query:
+        if pageid == "-1":
+            return False
+        if "revisions" not in query[pageid]:
+            return False
+        return query[pageid]["revisions"][0]["slots"]["main"]["*"]
+
+    return False
+
+def get_text_by_id(revid):
+    params = {
+        "action": "query",
+        "prop": "revisions",
+        "revids": revid,
+        "rvprop": "content",
+        "rvslots": "main"
+    }
+    query = session.get(params)["query"]["pages"]
+    for pageid in query:
+        if pageid == "-1":
+            return False
+        if "revisions" not in query[pageid]:
+            return False
+        return query[pageid]["revisions"][0]["slots"]["main"]["*"]
+
+    return False
+
+def get_page_history(title, **kwargs):
+    params = {
+        "action": "query",
+        "prop": "revisions",
+        "titles": title,
+        "rvprop": "ids|timestamp|flags|comment|user",
+        "rvslots": "main"
+    }
+    for key, val in kwargs.items():
+        params[key] = val
+
+    query = session.get(params)["query"]["pages"]
+
+    for pageid in query:
+        if pageid == "-1":
+            return False
+        if "revisions" not in query[pageid]:
+            return False
+        return query[pageid]["revisions"]
+
+    return False
+
+def get_user_rights(user):
+    params = {
+        "action": "query",
+        "list": "users",
+        "ususers": user,
+        "usprop": "groups"
+    }
+    query = session.get(params)
+
+    if "groups" in query["query"]["users"][0]:
+        return query["query"]["users"][0]["groups"]
+
+    return False
+
+def is_reverted(title, revid):
+    pick = False
+
+    revisions = get_page_history(title, rvprop="ids|sha1", rvlimit=10)
+    for rev in revisions:
+        if str(rev["revid"]) == str(revid):
+            return False
+
+        for drev in revisions:
+            if str(drev["revid"]) == str(revid):
+                pick = True
+                continue
+            if not pick:
+                continue
+
+            if rev["sha1"] == drev["sha1"]:
                 return True
 
-            return False
-
-        return False
-
-    def latest_reviewed(title):
-        params = {
-            "action": "query",
-            "prop": "flagged",
-            "titles": title,
-            "format": "json"
-        }
-
-        query = session.get(params)
-        answer = query["query"]["pages"]
-
-        for pageid in answer:
-            if ("flagged" in answer[pageid] and "stable_revid" in answer[pageid]["flagged"] and
-                "pending_since" in answer[pageid]["flagged"] and
-                answer[pageid]["flagged"]["stable_revid"] != "" and
-                answer[pageid]["flagged"]["stable_revid"] != None and
-                type(answer[pageid]["flagged"]["stable_revid"]) is int and
-                answer[pageid]["flagged"]["pending_since"] != ""):
-
-                return True
-
-            return False
-
-        return False
-
-    def get_token(token_type):
-        params = {
-            "action": "query",
-            "meta": "tokens",
-            "type": parameter_maker(token_type)
-        }
-        return session.get(params)["query"]["tokens"]
-
-    def stabilize(title, reason, expiry="infinite"):
-        params = {
-            "action": "stabilize",
-            "title": title,
-            "reason": reason,
-            "default": "stable",
-            "expiry": expiry,
-            "token": MWAPI.get_token(["csrf"])["csrftoken"]
-        }
-
-        try:
-            session.post(params)
-        except:
-            logger.error("failed to stabilize check crasreport for details")
-            logger.critical(traceback.format_exc())
-            return False
-
-        return True
-
-    def get_latest_rev(title):
-        params = {
-            "action": "query",
-            "prop": "revisions",
-            "titles": title,
-            "rvprop": "ids",
-        }
-        query = session.get(params)["query"]["pages"]
-
-        for pageid in query:
-            if pageid == "-1":
-                return False
-            if "revisions" not in query[pageid]:
-                return False
-            return query[pageid]["revisions"][0]["revid"]
-
-        return False
-
-    def get_sha1(revid):
-        params = {
-            "action": "query",
-            "prop": "revisions",
-            "revids": revid,
-            "rvprop": "sha1",
-            "format": "json"
-        }
-        query = session.get(params)["query"]["pages"]
-
-        for pageid in query:
-            if pageid == "-1":
-                return False
-            if "revisions" not in query[pageid]:
-                return False
-            return query[pageid]["revisions"][0]["sha1"]
-
-        return False
-
-    def get_text(title):
-        params = {
-            "action": "query",
-            "prop": "revisions",
-            "titles": title,
-            "rvprop": "content",
-            "rvslots": "main"
-        }
-        query = session.get(params)["query"]["pages"]
-        for pageid in query:
-            if pageid == "-1":
-                return False
-            if "revisions" not in query[pageid]:
-                return False
-            return query[pageid]["revisions"][0]["slots"]["main"]["*"]
-
-        return False
-
-    def get_text_by_id(revid):
-        params = {
-            "action": "query",
-            "prop": "revisions",
-            "revids": revid,
-            "rvprop": "content",
-            "rvslots": "main"
-        }
-        query = session.get(params)["query"]["pages"]
-        for pageid in query:
-            if pageid == "-1":
-                return False
-            if "revisions" not in query[pageid]:
-                return False
-            return query[pageid]["revisions"][0]["slots"]["main"]["*"]
-
-        return False
-
-    def get_page_history(title, **kwargs):
-        params = {
-            "action": "query",
-            "prop": "revisions",
-            "titles": title,
-            "rvprop": "ids|timestamp|flags|comment|user",
-            "rvslots": "main"
-        }
-        for key, val in kwargs.items():
-            params[key] = val
-
-        query = session.get(params)["query"]["pages"]
-
-        for pageid in query:
-            if pageid == "-1":
-                return False
-            if "revisions" not in query[pageid]:
-                return False
-            return query[pageid]["revisions"]
-
-        return False
-
-    def get_user_rights(user):
-        params = {
-            "action": "query",
-            "list": "users",
-            "ususers": user,
-            "usprop": "groups"
-        }
-        query = session.get(params)
-
-        if "groups" in query["query"]["users"][0]:
-            return query["query"]["users"][0]["groups"]
-
-        return False
-
-    def is_reverted(title, revid):
         pick = False
 
-        revisions = MWAPI.get_page_history(title, rvprop="ids|sha1", rvlimit=10)
-        for rev in revisions:
-            if str(rev["revid"]) == str(revid):
-                return False
-           
-            for drev in revisions:
-                if str(drev["revid"]) == str(revid):
-                    pick = True
-                    continue
-                if not pick:
-                    continue
-               
-                if rev["sha1"] == drev["sha1"]:
-                    return True
+    return False
 
-            pick = False
+def get_stable_log(title, timestamp=None):
+    params = {
+        "action": "query",
+        "list": "logevents",
+        "letype": "stable",
+        "letitle": title
+    }
+    if timestamp:
+        query = session.get(params, leend=timestamp)
+        return query
+    else:
+        query = session.get(params)
+        return query
 
-        return False
+    return False
 
-    def get_stable_log(title, timestamp=None):
-        params = {
-            "action": "query",
-            "list": "logevents",
-            "letype": "stable",
-            "letitle": title
-        }
-        if timestamp:
-            query = session.get(params, leend=timestamp)
-            return query
-        else:
-            query = session.get(params)
-            return query
-
-        return False
-
-    def save_page(title, text, comment, minor=False):
-        params = {
-            "action": "edit",
-            "title": title,
-            "text": text,
-            "summary": comment,
-            "minor": minor,
-            "bot": True,
-            "token": MWAPI.get_token(["csrf"])["csrftoken"]
-        }
-        session.post(params)
-        return True
+def save_page(title, text, comment, minor=False):
+    params = {
+        "action": "edit",
+        "title": title,
+        "text": text,
+        "summary": comment,
+        "minor": minor,
+        "bot": True,
+        "token": get_token(["csrf"])["csrftoken"]
+    }
+    session.post(params)
+    return True

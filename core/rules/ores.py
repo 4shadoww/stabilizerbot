@@ -1,5 +1,5 @@
 from core.rule_core import *
-from core import yapi
+from core import yapi as api
 
 from core.config_loader import cur_conf
 
@@ -7,8 +7,6 @@ class RuleModule:
 
     name = "ores"
     cfg_ver = None
-
-    ores_api = yapi.ORES
 
     config = [
         {
@@ -31,7 +29,7 @@ class RuleModule:
         # Check result and check for errors
         # If error faced then try again once
         for i in reversed(range(tries)):
-            scores = self.ores_api.get_score([rev["revision"]["new"]])[cur_conf["core"]["lang"]+"wiki"]["scores"]
+            scores = api.get_score([rev["revision"]["new"]])[cur_conf["core"]["lang"]+"wiki"]["scores"]
             revid_data = scores[str(rev["revision"]["new"])]
 
             for item in revid_data:
