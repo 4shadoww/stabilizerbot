@@ -34,14 +34,9 @@ def should_check(rev):
     if datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(rev["timestamp"]) > delta:
         return False
 
-    # TODO Create one function which does all of this with one api call
-    if api.stabilized(rev["title"]):
-        return False
-
-    if not api.reviewed(rev["title"]):
-        return False
-
-    if not api.latest_pending(rev["title"]):
+    # Merged logic api.stabilized, api.reviewed and api.latest_pending
+    # Checks is page stabilised already, is page reviewed and is lastest change pending
+    if not api.should_check(rev["title"]):
         return False
 
     return True

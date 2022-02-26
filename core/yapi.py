@@ -110,9 +110,11 @@ def reviewed(title):
     answer = query["query"]["pages"]
 
     for pageid in answer:
-        if ("flagged" in answer[pageid] and "stable_revid" in answer[pageid]["flagged"]
-        and answer[pageid]["flagged"]["stable_revid"] != "" and answer[pageid]["flagged"]["stable_revid"] != None
-        and type(answer[pageid]["flagged"]["stable_revid"]) is int):
+        if ("flagged" in answer[pageid] and "stable_revid" in answer[pageid]["flagged"] and
+            answer[pageid]["flagged"]["stable_revid"] != "" and
+            answer[pageid]["flagged"]["stable_revid"] != None and
+            type(answer[pageid]["flagged"]["stable_revid"]) is int):
+
             return True
 
         return False
@@ -143,6 +145,45 @@ def latest_pending(title):
         return False
 
     return False
+
+def should_check(title):
+    params = {
+        "action": "query",
+        "prop": "flagged",
+        "titles": title,
+        "format": "json"
+    }
+
+    try:
+        query = session.get(params)
+    except ValueError:
+        return False
+    answer = query["query"]["pages"]
+
+    for pageid in answer:
+        # Is stabilised
+        if "flagged" in answer[pageid] and "protection_level" in answer[pageid]["flagged"]:
+            return False
+        # Page is not reviewed ever
+        elif not ("flagged" in answer[pageid] and "stable_revid" in answer[pageid]["flagged"] and
+                  answer[pageid]["flagged"]["stable_revid"] != "" and
+                  answer[pageid]["flagged"]["stable_revid"] != None and
+                  type(answer[pageid]["flagged"]["stable_revid"]) is int):
+            return False
+
+        # Latest is not pending
+        elif not ("flagged" in answer[pageid] and "stable_revid" in answer[pageid]["flagged"] and
+                  "pending_since" in answer[pageid]["flagged"] and
+                  answer[pageid]["flagged"]["stable_revid"] != "" and
+                  answer[pageid]["flagged"]["stable_revid"] != None and
+                  type(answer[pageid]["flagged"]["stable_revid"]) is int and
+                  answer[pageid]["flagged"]["pending_since"] != ""):
+            return False
+
+        return True
+
+    return False
+
 
 def get_token(token_type):
     params = {
