@@ -3,10 +3,9 @@ import datetime
 import logging
 
 from core import timelib
-from core import yapi
+from core import yapi as api
 
 logger = logging.getLogger("infolog")
-api = yapi.MWAPI
 
 # Get reverts from article
 def get_reverts(title, hours=1):

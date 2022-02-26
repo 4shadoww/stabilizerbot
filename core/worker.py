@@ -41,7 +41,6 @@ def should_check(rev):
     if not api.reviewed(rev["title"]):
         return False
 
-    print(api.latest_pending(rev["title"]))
     if not api.latest_pending(rev["title"]):
         return False
 
