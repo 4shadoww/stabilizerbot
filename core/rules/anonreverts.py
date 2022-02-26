@@ -4,7 +4,7 @@ from core import yapi
 
 api = yapi.MWAPI
 
-class YunoModule:
+class RuleModule:
 
     name = "anonreverts"
     cfg_ver = None
@@ -22,14 +22,14 @@ class YunoModule:
     def run(self, rev):
         for rule in self.config:
             ip_reverts = 0
-            reverts = op.getReverts(rev["title"], hours=rule["hours"])
+            reverts = op.get_reverts(rev["title"], hours=rule["hours"])
             if not reverts:
                 continue
             if len(reverts) >= rule["reverts_required"]:
                 for revert in reverts:
                     if revert["reverter"] != revert["victim"]:
-                        victim_groups = api.getUserRights(revert["victim"])
-                        reverter_groups = api.getUserRights(revert["reverter"])
+                        victim_groups = api.get_user_rights(revert["victim"])
+                        reverter_groups = api.get_user_rights(revert["reverter"])
 
                         if not victim_groups or not reverter_groups:
                             continue

@@ -1,6 +1,6 @@
 from core.rule_core import *
 
-class YunoModule:
+class RuleModule:
 
     name = "template"
     cfg_ver = None

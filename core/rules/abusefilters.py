@@ -4,7 +4,7 @@ from core.rule_core import *
 from core import yapi
 from core import timelib
 
-class YunoModule:
+class RuleModule:
 
     name = "abusefilters"
     cfg_ver = None
@@ -34,9 +34,9 @@ class YunoModule:
 
         end = datetime.timedelta(hours=self.config["hours"])
 
-        time =  timelib.toString(datetime.datetime.utcnow()-end)
+        time =  timelib.to_string(datetime.datetime.utcnow()-end)
 
-        result = self.api.getAbuseFiler(rev["user"], time, self.config["filters"])
+        result = self.api.get_abuse_filter(rev["user"], time, self.config["filters"])
 
         if "error" in result:
             logger.error("abusefilters error: %s" % result["error"]["code"])

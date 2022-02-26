@@ -19,7 +19,7 @@ class Executor:
     last_ign = None
 
     # Load rules that are listed in config.json at core or in online config
-    def loadRules(self):
+    def load_rules(self):
         if self.last_rules != config_loader.cur_conf["core"]["rules"] or self.last_ign != config_loader.cur_conf["core"]["ign_rules"]:
             self.rules = []
             logger.info("loading rules")
@@ -29,15 +29,15 @@ class Executor:
                 if rule not in config_loader.cur_conf["core"]["ign_rules"]:
                     try:
                         module = importlib.import_module("core.rules."+rule)
-                        self.rules.append(module.YunoModule())
+                        self.rules.append(module.RuleModule())
                     except ModuleNotFoundError:
                         logger.error("module \"%s\" not found" % rule)
 
     # Check every rule and return True if needed score is reached
-    def shouldStabilize(self, rev):
+    def should_stabilize(self, rev):
         overall_score = 0
         final_expiry = 0
-        self.loadRules()
+        self.load_rules()
         scores = {}
         for rule in self.rules:
             try:

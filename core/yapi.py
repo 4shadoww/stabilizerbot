@@ -12,7 +12,7 @@ from core.config_loader import cur_conf
 
 logger = logging.getLogger("infolog")
 
-def parameterMaker(values):
+def parameter_maker(values):
     if type(values) != list:
         return values
 
@@ -28,12 +28,12 @@ def parameterMaker(values):
 class ORES:
     base_url = "https://ores.wikimedia.org/v3/scores/"+cur_conf["core"]["lang"]+"wiki?"
 
-    def getScore(revids, models=None):
+    def get_score(revids, models=None):
         if not models:
             models = ["goodfaith", "damaging"]
         params = {
-            "revids": parameterMaker(revids),
-            "models": parameterMaker(models)
+            "revids": parameter_maker(revids),
+            "models": parameter_maker(models)
         }
 
         request_url = ORES.base_url + urlencode(params)
@@ -47,27 +47,27 @@ class ORES:
 class MWAPI:
     # TODO api calls could be sent as batches
     # to make responses faster and save resources on api
-    def getRevision(revids, param=None):
+    def get_revision(revids, param=None):
         if not param:
             param = ["ids", "timestamp", "flags", "user"]
         params = {
             "action": "query",
             "prop": "revisions",
-            "revids": parameterMaker(revids),
-            "rvprop": parameterMaker(param),
+            "revids": parameter_maker(revids),
+            "rvprop": parameter_maker(param),
             "format": "json"
         }
 
         return session.get(params)
 
-    def getAbuseFiler(user, timestamp, filters, param=None):
+    def get_abuse_filter(user, timestamp, filters, param=None):
         if not param:
             param = ["ids", "user", "title", "action", "result", "timestamp", "hidden", "revid"]
         params = {
             "action": "query",
             "list": "abuselog",
-            "aflfilter": parameterMaker(filters),
-            "aflprop": parameterMaker(param),
+            "aflfilter": parameter_maker(filters),
+            "aflprop": parameter_maker(param),
             "afluser": user,
             "afldir": "newer",
             "aflstart": timestamp,
@@ -143,11 +143,11 @@ class MWAPI:
 
         return False
 
-    def getToken(token_type):
+    def get_token(token_type):
         params = {
             "action": "query",
             "meta": "tokens",
-            "type": parameterMaker(token_type)
+            "type": parameter_maker(token_type)
         }
         return session.get(params)["query"]["tokens"]
 
@@ -158,7 +158,7 @@ class MWAPI:
             "reason": reason,
             "default": "stable",
             "expiry": expiry,
-            "token": MWAPI.getToken(["csrf"])["csrftoken"]
+            "token": MWAPI.get_token(["csrf"])["csrftoken"]
         }
 
         try:
@@ -170,7 +170,7 @@ class MWAPI:
 
         return True
 
-    def getLatestRev(title):
+    def get_latest_rev(title):
         params = {
             "action": "query",
             "prop": "revisions",
@@ -188,7 +188,7 @@ class MWAPI:
 
         return False
 
-    def getSha1(revid):
+    def get_sha1(revid):
         params = {
             "action": "query",
             "prop": "revisions",
@@ -207,7 +207,7 @@ class MWAPI:
 
         return False
 
-    def getText(title):
+    def get_text(title):
         params = {
             "action": "query",
             "prop": "revisions",
@@ -225,7 +225,7 @@ class MWAPI:
 
         return False
 
-    def getTextById(revid):
+    def get_text_by_id(revid):
         params = {
             "action": "query",
             "prop": "revisions",
@@ -243,7 +243,7 @@ class MWAPI:
 
         return False
 
-    def getPageHistory(title, **kwargs):
+    def get_page_history(title, **kwargs):
         params = {
             "action": "query",
             "prop": "revisions",
@@ -265,7 +265,7 @@ class MWAPI:
 
         return False
 
-    def getUserRights(user):
+    def get_user_rights(user):
         params = {
             "action": "query",
             "list": "users",
@@ -279,10 +279,10 @@ class MWAPI:
 
         return False
 
-    def isReverted(title, revid):
+    def is_reverted(title, revid):
         pick = False
 
-        revisions = MWAPI.getPageHistory(title, rvprop="ids|sha1", rvlimit=10)
+        revisions = MWAPI.get_page_history(title, rvprop="ids|sha1", rvlimit=10)
         for rev in revisions:
             if str(rev["revid"]) == str(revid):
                 return False
@@ -301,7 +301,7 @@ class MWAPI:
 
         return False
 
-    def getStableLog(title, timestamp=None):
+    def get_stable_log(title, timestamp=None):
         params = {
             "action": "query",
             "list": "logevents",
@@ -317,7 +317,7 @@ class MWAPI:
 
         return False
 
-    def savePage(title, text, comment, minor=False):
+    def save_page(title, text, comment, minor=False):
         params = {
             "action": "edit",
             "title": title,
@@ -325,7 +325,7 @@ class MWAPI:
             "summary": comment,
             "minor": minor,
             "bot": True,
-            "token": MWAPI.getToken(["csrf"])["csrftoken"]
+            "token": MWAPI.get_token(["csrf"])["csrftoken"]
         }
         session.post(params)
         return True

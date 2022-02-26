@@ -2,6 +2,7 @@
 import datetime
 import time
 import json
+import sys
 import threading
 import traceback
 import logging
@@ -21,11 +22,11 @@ logger = logging.getLogger("infolog")
 lock = threading.Lock()
 pending = []
 
-def shouldCheck(rev):
+def should_check(rev):
     delta = datetime.timedelta(hours=1)
 
     # Check should revision to be checked at all
-    revs = api.getRevision([rev["revision"]["new"]])
+    revs = api.get_revision([rev["revision"]["new"]])
 
     if "badrevids" in revs["query"]:
         return False
@@ -73,9 +74,9 @@ class ConfigUpdate(threading.Thread):
             if times >= uf:
                 times = 0
                 if cfgl.cur_conf["core"]["config_mode"] == "online":
-                    cfgl.checkForOnlineUpdate()
+                    cfgl.check_for_online_update()
                 else:
-                    cfgl.checkForLocalUpdate()
+                    cfgl.check_for_local_update()
 
             if self.killer.kill:
                 return
@@ -94,7 +95,7 @@ class Stabilizer(threading.Thread):
         super(Stabilizer, self).__init__()
 
     def stabilize(self):
-        if not cfgl.cur_conf["core"]["reverted"] and api.isReverted(self.rev["title"], self.rev["revision"]["new"]):
+        if not cfgl.cur_conf["core"]["reverted"] and api.is_reverted(self.rev["title"], self.rev["revision"]["new"]):
             return False
 
         if not cfgl.cur_conf["core"]["test"] and not cfgl.cur_conf["core"]["test"]:
@@ -105,7 +106,7 @@ class Stabilizer(threading.Thread):
             reason = cfgl.dictionary[cfgl.cur_conf["core"]["lang"]]["reasons"]["YV1"] % revlink
 
             # Stabilize
-            api.stabilize(self.rev["title"], reason, expiry=timelib.toString(dtexpiry))
+            api.stabilize(self.rev["title"], reason, expiry=timelib.to_string(dtexpiry))
 
             return True
 
@@ -119,7 +120,7 @@ class Stabilizer(threading.Thread):
             time.sleep(0.5)
             times += 0.5
 
-        if shouldCheck(self.rev):
+        if should_check(self.rev):
             lock.acquire()
             pending.remove(self.rev["title"])
             lock.release()
@@ -156,8 +157,8 @@ class Worker:
                         if self.tries != 0:
                             self.tries = 0
                         # Check should revision to be checked at all
-                        if shouldCheck(change) and change["title"] not in pending:
-                            expiry = self.r_exec.shouldStabilize(change)
+                        if should_check(change) and change["title"] not in pending:
+                            expiry = self.r_exec.should_stabilize(change)
                             if expiry and not cfgl.cur_conf["core"]["test"] and change["title"] not in pending:
                                 lock.acquire()
                                 pending.append(change["title"])

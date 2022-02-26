@@ -3,7 +3,7 @@ import json
 from core.rule_core import *
 from core import yapi
 
-class YunoModule:
+class RuleModule:
 
     name = "whitelist"
     cfg_ver = None
@@ -21,14 +21,14 @@ class YunoModule:
         score = 0
         expiry = None
 
-        lastrev = self.api.getLatestRev(self.config["list_path"])
+        lastrev = self.api.get_latest_rev(self.config["list_path"])
 
         if not lastrev:
             logger.critical("whitelist not found")
             return score, expiry
 
         if lastrev != self.list_ver:
-            self.whitelist = json.loads(self.api.getText(self.config["list_path"]))
+            self.whitelist = json.loads(self.api.get_text(self.config["list_path"]))
             self.list_ver = lastrev
 
         for user in self.whitelist["values"]:

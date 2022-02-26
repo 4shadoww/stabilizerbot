@@ -9,13 +9,13 @@ logger = logging.getLogger("infolog")
 api = yapi.MWAPI
 
 # Get reverts from article
-def getReverts(title, hours=1):
+def get_reverts(title, hours=1):
     reverts = []
 
     end = datetime.datetime.utcnow() - datetime.timedelta(hours=hours)
-    edits = api.getPageHistory(title, rvprop="timestamp|user|content|ids", rvend=timelib.toString(end))
+    edits = api.get_page_history(title, rvprop="timestamp|user|content|ids", rvend=timelib.to_string(end))
     if not edits:
-        logger.error("failed to receive edits end: %s, title: %s" % (timelib.toString(end), title))
+        logger.error("failed to receive edits end: %s, title: %s" % (timelib.to_string(end), title))
         return False
 
     for i in range(len(edits)):

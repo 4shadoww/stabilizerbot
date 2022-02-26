@@ -12,14 +12,14 @@ logger = logging.getLogger("infolog")
 from core import path
 
 # Config location
-config_file_loc = path.main()+"core/config.json"
+config_file_loc = path.main()+"config.json"
 
 # Load dict
 f_dict = open(path.main()+"core/dict.json")
 dictionary = json.load(f_dict)
 
 # Generate new config
-def createNewConfig():
+def create_new_config():
     default_config = """{
     "lang": "fi",
     "site": "https://fi.wikipedia.org",
@@ -51,7 +51,7 @@ except:
     logger.critical("failed to load core config")
     logger.critical("failed to startup")
     logger.info("generaing new config")
-    createNewConfig()
+    create_new_config()
     logger.critical(traceback.format_exc())
     sys.exit(1)
 
@@ -60,19 +60,19 @@ from core import yapi
 
 cfg_ver = 0
 
-def updateConfigItems(holder, new):
+def update_config_items(holder, new):
     for item in new:
         holder[item] = new[item]
 
-def updateConfig(holder, new):
+def update_config(holder, new):
     for item in new:
         if item == "core":
-            updateConfigItems(holder["core"], new[item])
+            update_config_items(holder["core"], new[item])
         else:
             holder[item] = new[item]
 
 # Check for new local configs
-def checkForLocalUpdate():
+def check_for_local_update():
     global cur_conf
     global cfg_ver
     for conf in glob.glob(path.main()+"conf/"+"*.json"):
@@ -91,11 +91,11 @@ def checkForLocalUpdate():
             logger.info("new local config \"%s\" loaded to core" % namestr)
 
 # Check for new online config
-def checkForOnlineUpdate():
+def check_for_online_update():
     global cfg_ver
     global cur_conf
 
-    lastrev = yapi.MWAPI.getLatestRev(cur_conf["core"]["online_conf_path"])
+    lastrev = yapi.MWAPI.get_latest_rev(cur_conf["core"]["online_conf_path"])
 
     if not lastrev:
         logger.error("config page \"%s\" doesn't exists" % cur_conf["core"]["online_conf_path"])
@@ -103,7 +103,7 @@ def checkForOnlineUpdate():
     if lastrev != cfg_ver:
         logger.info("found new online config: %s" % str(lastrev))
         cfg_ver = lastrev
-        conf = yapi.MWAPI.getText(cur_conf["core"]["online_conf_path"])
+        conf = yapi.MWAPI.get_text(cur_conf["core"]["online_conf_path"])
         try:
             new = json.loads(conf)
         except:
@@ -111,5 +111,5 @@ def checkForOnlineUpdate():
             logger.critical(traceback.format_exc())
             return 1
 
-        updateConfig(cur_conf, new)
+        update_config(cur_conf, new)
         logger.info("new online config loaded to core")

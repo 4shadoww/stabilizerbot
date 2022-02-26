@@ -3,7 +3,7 @@ from core import yapi
 
 from core.config_loader import cur_conf
 
-class YunoModule:
+class RuleModule:
 
     name = "ores"
     cfg_ver = None
@@ -25,13 +25,13 @@ class YunoModule:
         if core.config.config_mode == "online":
             pass
 
-    def getScores(self, rev):
+    def get_scores(self, rev):
         tries = 2
         revid_data = 1
         # Check result and check for errors
         # If error faced then try again once
         for i in reversed(range(tries)):
-            scores = self.ores_api.getScore([rev["revision"]["new"]])[cur_conf["core"]["lang"]+"wiki"]["scores"]
+            scores = self.ores_api.get_score([rev["revision"]["new"]])[cur_conf["core"]["lang"]+"wiki"]["scores"]
             revid_data = scores[str(rev["revision"]["new"])]
 
             for item in revid_data:
@@ -48,7 +48,7 @@ class YunoModule:
         score = 0
         expiry = None
 
-        revid_data = self.getScores(rev)
+        revid_data = self.get_scores(rev)
 
         if not revid_data:
             return score, expiry

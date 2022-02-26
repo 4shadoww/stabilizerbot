@@ -2,8 +2,8 @@ import datetime
 
 time_format = "%Y-%m-%dT%H:%M:%SZ"
 
-def toString(time):
+def to_string(time):
     return time.strftime(time_format)
 
-def toDatetime(time):
-    return datetime.strptime(time, time_format)
+def to_datetime(time):
+    return datetime.datetime.strptime(time, time_format)

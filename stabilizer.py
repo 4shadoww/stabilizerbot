@@ -22,7 +22,7 @@ class LessThanFilter(logging.Filter):
     def filter(self, record):
         return 1 if record.levelno < self.max_level else 0
 
-def setupLogging():
+def setup_logging():
     # Logging
     logger = logging.getLogger("infolog")
     logger.setLevel(logging.DEBUG)
@@ -64,7 +64,7 @@ def setupLogging():
 
 def main():
     try:
-        setupLogging()
+        setup_logging()
         logger = logging.getLogger("infolog")
         # Login
         logger.info("logging...")
