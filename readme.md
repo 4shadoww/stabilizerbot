@@ -1,16 +1,16 @@
 stabilizerbot
 =============
 
-Stabilizerbot is a bot for mediawiki FlaggedRevs extension that stabilizes articles automatically when specific rules are met. If you're planning to use this in Wikimedia foundation project, then you don't need to run the bot. It can be done for you.
+Stabilizerbot is a bot for mediawiki FlaggedRevs extension that stabilizes articles automatically when specific rules are met.
 
 Dependencies
 ------------
-Requires Python 3. Python dependencies are the following: sseclient and mwapi. It's recommended to use the latest version of mwapi from Github and to not install it using pip since it haven't been updated in many years. 
+Requires Python 3. Python dependencies are the following: sseclient and mwapi. It's recommended to use the latest version of mwapi from Github and to not install it from pypi since it has not been updated in years. 
 
 Rules
 -----
 
-List of currently supported rules:
+List of rules:
 * Anonreverts
 * Abusefilters
 * Greylist
