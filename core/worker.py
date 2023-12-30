@@ -13,7 +13,6 @@ from sseclient import SSEClient as EventSource
 from core import config_loader as cfgl
 from core import rule_executor
 from core import yapi as api
-from core import path
 from core import timelib
 
 logger = logging.getLogger("infolog")
@@ -133,7 +132,7 @@ class Worker:
         self.killer = Killer()
         self.cf_updater = ConfigUpdate(self.killer)
         self.cf_updater.start()
-        tries = 0
+        self.tries = 0
 
     def run(self):
         try:
@@ -147,7 +146,8 @@ class Worker:
                     except ValueError:
                         continue
 
-                    if change["wiki"] == wiki and change["type"] == "edit" and change["namespace"] in cfgl.cur_conf["core"]["namespaces"]:
+                    if "wiki" in change and "type" in change and "namespace" in change and \
+                       change["wiki"] == wiki and change["type"] == "edit" and change["namespace"] in cfgl.cur_conf["core"]["namespaces"]:
                         if self.tries != 0:
                             self.tries = 0
                         # Check should revision to be checked at all
