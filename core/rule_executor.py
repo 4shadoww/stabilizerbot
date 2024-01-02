@@ -48,7 +48,7 @@ class Executor:
 
                 score, expiry = rule.run(rev)
                 scores[rule.name] = score
-                logger.info("%s on page: %s score: %s" % (rule.name, rev["title"], str(score)))
+                logger.info("%s on page: %s (%s) score: %s" % (rule.name, rev["title"], rev["revision"]["new"], str(score)))
 
                 if score < 0:
                     return False
