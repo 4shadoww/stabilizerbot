@@ -5,7 +5,7 @@ from core.config_loader import cur_conf
 
 class RuleModule:
 
-    name = "ores"
+    name = "liftwing"
     cfg_ver = None
 
     config = [
@@ -25,22 +25,21 @@ class RuleModule:
 
     def get_scores(self, rev):
         tries = 2
-        revid_data = 1
+        scores = None
         # Check result and check for errors
         # If error faced then try again once
         for i in reversed(range(tries)):
-            scores = api.get_score([rev["revision"]["new"]])[cur_conf["core"]["lang"]+"wiki"]["scores"]
-            revid_data = scores[str(rev["revision"]["new"])]
+            scores = api.get_score(rev["revision"]["new"])
 
-            for item in revid_data:
-                if "error" in revid_data[item] and "scores" not in revid_data[item]:
+            for item in scores:
+                if "error" in scores[item] and "probability" not in revid_data[item]:
                     if i <= 0:
-                        logger.error("failed to fetch ores revision data: %s" % str(revid_data))
-                        return False
+                        logger.error("failed to fetch liftwing revision data: %s" % str(revid_data))
+                        return None
                 else:
                     break
 
-        return revid_data
+        return scores
 
     def run(self, rev):
         score = 0
@@ -59,16 +58,16 @@ class RuleModule:
                     break
 
                 for value in rule["models"][item]:
-                    if value == "max_false" and rule["models"][item][value] < revid_data[item]["score"]["probability"]["false"]:
+                    if value == "max_false" and rule["models"][item][value] < revid_data[item]["probability"]["false"]:
                         failed = True
                         break
-                    elif value == "min_false" and rule["models"][item][value] > revid_data[item]["score"]["probability"]["false"]:
+                    elif value == "min_false" and rule["models"][item][value] > revid_data[item]["probability"]["false"]:
                         failed = True
                         break
-                    elif value == "max_true" and rule["models"][item][value] < revid_data[item]["score"]["probability"]["true"]:
+                    elif value == "max_true" and rule["models"][item][value] < revid_data[item]["probability"]["true"]:
                         failed = True
                         break
-                    elif value == "min_true" and rule["models"][item][value] > revid_data[item]["score"]["probability"]["true"]:
+                    elif value == "min_true" and rule["models"][item][value] > revid_data[item]["probability"]["true"]:
                         failed = True
                         break
 

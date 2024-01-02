@@ -1,18 +1,20 @@
 # Import python modules
 import json
-from urllib.request import urlopen
-from urllib.parse import urlencode
+import requests
 import traceback
 import logging
 
 from core.session import session
+from user_config import access_token
 
 # Import core modules
 from core.config_loader import cur_conf
 
 logger = logging.getLogger("infolog")
 
-ores_base_url = "https://ores.wikimedia.org/v3/scores/"+cur_conf["core"]["lang"]+"wiki?"
+LIFTWING_BASE_URL = "https://api.wikimedia.org/service/lw/inference/v1/models/"
+LIFTWING_DAMAGING_URL = LIFTWING_BASE_URL + cur_conf["core"]["lang"] + "wiki-damaging:predict"
+LIFTWING_GOODFAITH_URL = LIFTWING_BASE_URL + cur_conf["core"]["lang"] + "wiki-goodfaith:predict"
 
 def parameter_maker(values):
     if type(values) != list:
@@ -28,20 +30,24 @@ def parameter_maker(values):
     return final_str
 
 
-def get_score(revids, models=None):
-    if not models:
-        models = ["goodfaith", "damaging"]
-        params = {
-            "revids": parameter_maker(revids),
-            "models": parameter_maker(models)
-        }
+def get_score(revid):
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + access_token,
+        'User-Agent': 'stabilizerbot (https://wikitech.wikimedia.org/wiki/User:4shadoww)'
+    }
 
-    request_url = ores_base_url + urlencode(params)
+    data = {
+        "rev_id": int(revid)
+    }
 
-    request = urlopen(request_url)
     try:
-        request = request.read().decode('utf8')
-        return json.loads(request)
+        damaging = requests.post(LIFTWING_DAMAGING_URL, headers=headers, data=json.dumps(data))
+        goodfaith = requests.post(LIFTWING_GOODFAITH_URL, headers=headers, data=json.dumps(data))
+
+        damaging_data = json.loads(damaging.text)[cur_conf['core']['lang']+'wiki']['scores'][str(revid)]['damaging']['score']
+        goodfaith_data = json.loads(goodfaith.text)[cur_conf['core']['lang']+'wiki']['scores'][str(revid)]['goodfaith']['score']
+        return {'damaging': damaging_data, 'goodfaith': goodfaith_data}
     except AttributeError:
         return False
 

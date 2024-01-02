@@ -8,3 +8,5 @@ core/config.json
 config.json
 conf/rules.json
 virtual-env/
+*.pyc
+api-token
