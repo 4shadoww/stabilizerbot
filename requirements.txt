@@ -1,2 +1,2 @@
 git+https://github.com/mediawiki-utilities/python-mwapi.git
-sseclient
+git+https://github.com/btubbs/sseclient.git
