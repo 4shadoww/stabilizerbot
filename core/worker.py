@@ -63,6 +63,7 @@ class ConfigUpdate(threading.Thread):
         times = uf
         while True:
             if self.killer.kill:
+                logger.info('ConfigUpdate: thread terminated')
                 return
             if times >= uf:
                 times = 0
@@ -72,6 +73,7 @@ class ConfigUpdate(threading.Thread):
                     cfgl.check_for_local_update()
 
             if self.killer.kill:
+                logger.info('ConfigUpdate: thread terminated')
                 return
 
             time.sleep(0.5)
@@ -179,4 +181,5 @@ class Worker:
             logger.info("terminating threads")
             self.killer.kill = True
             self.cf_updater.join()
+            logger.info("threads terminated")
             sys.exit(1)
