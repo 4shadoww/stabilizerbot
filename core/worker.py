@@ -8,7 +8,7 @@ import traceback
 import logging
 import os
 
-import sseclient
+from requests_sse import EventSource, InvalidStatusCodeError, InvalidContentTypeError
 import requests
 
 # Import core modules
@@ -144,38 +144,48 @@ class Worker:
         self.tries = 0
 
 
-    def get_event_stream_client(self):
-        headers = {'Accept': 'text/event-stream'}
-        response = requests.get(cfgl.cur_conf["core"]["stream_url"], stream=True, headers=headers)
-        return sseclient.SSEClient(response)
-
-
     def run(self):
         try:
-            wiki = cfgl.cur_conf["core"]["lang"]+"wiki"
-            client = self.get_event_stream_client()
-            # Event stream
-            for event in client.events():
-                # Filter event stream
-                if event.event == 'message':
+            wiki = cfgl.cur_conf['core']['lang'] + 'wiki'
+
+            with EventSource(cfgl.cur_conf['core']['stream_url'], timeout=30) as event_source:
+                # Event stream
+                for event in event_source:
+                    # Filter event stream
+                    if event.type != 'message':
+                        continue
                     try:
                         change = json.loads(event.data)
                     except ValueError:
                         continue
 
-                    if "wiki" in change and "type" in change and "namespace" in change and \
-                       change["wiki"] == wiki and change["type"] == "edit" and change["namespace"] in cfgl.cur_conf["core"]["namespaces"]:
-                        if self.tries != 0:
-                            self.tries = 0
-                        # Check should revision to be checked at all
-                        if should_check(change) and change["title"] not in pending:
-                            expiry = self.r_exec.should_stabilize(change)
-                            if expiry and not cfgl.cur_conf["core"]["test"] and change["title"] not in pending:
-                                lock.acquire()
-                                pending.append(change["title"])
-                                lock.release()
-                                stabilizer = Stabilizer(self.killer, change, expiry)
-                                stabilizer.start()
+                    if 'wiki' not in change or \
+                       'type' not in change or \
+                       'namespace' not in change or \
+                       change['wiki'] != wiki or \
+                       change['type'] != 'edit' or \
+                       change['namespace'] not in cfgl.cur_conf['core']['namespaces']:
+                        continue
+
+                    if self.tries != 0:
+                        self.tries = 0
+
+                    # Check should revision to be checked at all
+                    if change['title'] in pending or not should_check(change):
+                        continue
+
+                    expiry = self.r_exec.should_stabilize(change)
+
+                    # Last checks
+                    lock.acquire()
+                    if cfgl.cur_conf['core']['test'] or not expiry or change['title'] in pending:
+                        continue
+
+                    # Stabilize
+                    pending.append(change['title'])
+                    lock.release()
+                    stabilizer = Stabilizer(self.killer, change, expiry)
+                    stabilizer.start()
 
         except KeyboardInterrupt:
             LOG.info("terminating stabilizer...")
@@ -183,7 +193,7 @@ class Worker:
             self.cf_updater.join()
             sys.exit(0)
 
-        except ConnectionResetError:
+        except requests.RequestException:
             if self.tries == 5:
                 LOG.error("giving up")
                 self.killer.kill = True

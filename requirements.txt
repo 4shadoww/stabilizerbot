@@ -1,2 +1,2 @@
 mwapi @ git+https://github.com/mediawiki-utilities/python-mwapi.git@fc45d32d118655acc95ab634c9e069e3670531fd
-sseclient-py @ git+https://github.com/mpetazzoni/sseclient.git@052edbf8b3cdabdd00adc8f8122948acbbc43428
+requests-sse @ git+https://github.com/overcat/requests-sse.git@4f121c60d9d67dcbb1f2b83b6e2d3daf6c9330d7
