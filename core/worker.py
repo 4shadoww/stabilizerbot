@@ -6,8 +6,10 @@ import sys
 import threading
 import traceback
 import logging
+import os
 
-from sseclient import SSEClient as EventSource
+import sseclient
+import requests
 
 # Import core modules
 from core import config_loader as cfgl
@@ -15,7 +17,7 @@ from core import rule_executor
 from core import yapi as api
 from core import timelib
 
-logger = logging.getLogger("infolog")
+LOG = logging.getLogger("infolog")
 
 lock = threading.Lock()
 pending = []
@@ -47,7 +49,7 @@ class Killer:
 # Updates config when changed every 30 seconds
 class ConfigUpdate(threading.Thread):
 
-    killer = None
+    killer: Killer
 
     def __init__(self, killer):
         self.killer = killer
@@ -55,15 +57,15 @@ class ConfigUpdate(threading.Thread):
 
     def run(self):
         if cfgl.cur_conf["core"]["config_mode"] == "online":
-            logger.info("online config mode enabled")
+            LOG.info("online config mode enabled")
         else:
-            logger.info("local config mode enabled")
+            LOG.info("local config mode enabled")
 
         uf = 30
         times = uf
         while True:
             if self.killer.kill:
-                logger.info('ConfigUpdate: thread terminated')
+                LOG.info('ConfigUpdate: thread terminated')
                 return
             if times >= uf:
                 times = 0
@@ -73,7 +75,7 @@ class ConfigUpdate(threading.Thread):
                     cfgl.check_for_local_update()
 
             if self.killer.kill:
-                logger.info('ConfigUpdate: thread terminated')
+                LOG.info('ConfigUpdate: thread terminated')
                 return
 
             time.sleep(0.5)
@@ -81,13 +83,14 @@ class ConfigUpdate(threading.Thread):
 
 class Stabilizer(threading.Thread):
 
-    killer = None
+    killer: Killer
 
     def __init__(self, killer, rev, expiry):
         self.killer = killer
         self.rev = rev
         self.expiry = expiry
         super(Stabilizer, self).__init__()
+
 
     def stabilize(self):
         if not cfgl.cur_conf["core"]["reverted"] and api.is_reverted(self.rev["title"], self.rev["revision"]["new"]):
@@ -101,9 +104,8 @@ class Stabilizer(threading.Thread):
             reason = cfgl.dictionary[cfgl.cur_conf["core"]["lang"]]["reasons"]["YV1"] % revlink
 
             # Stabilize
-            api.stabilize(self.rev["title"], reason, expiry=timelib.to_string(dtexpiry))
+            return api.stabilize(self.rev["title"], reason, expiry=timelib.to_string(dtexpiry))
 
-            return True
 
         return False
 
@@ -111,7 +113,8 @@ class Stabilizer(threading.Thread):
         times = 0
         while times < cfgl.cur_conf["core"]["s_delay"]:
             if self.killer.kill:
-                return False
+                return
+
             time.sleep(0.5)
             times += 0.5
 
@@ -119,13 +122,17 @@ class Stabilizer(threading.Thread):
             lock.acquire()
             pending.remove(self.rev["title"])
             lock.release()
-            self.stabilize()
-        return True
+            if not self.stabilize():
+                # Hack to exit the program when stabilize fails
+                # And that's because the session is probably gone bad
+                # So just exit with error and restart whole shit
+                os._exit(1)
+
 
 class Worker:
-    r_exec = None
-    killer = None
-    cf_updater = None
+    r_exec: rule_executor.Executor
+    killer: Killer
+    cf_updater: ConfigUpdate
     tries = 0
 
     def __init__(self):
@@ -136,11 +143,19 @@ class Worker:
         self.cf_updater.start()
         self.tries = 0
 
+
+    def get_event_stream_client(self):
+        headers = {'Accept': 'text/event-stream'}
+        response = requests.get(cfgl.cur_conf["core"]["stream_url"], stream=True, headers=headers)
+        return sseclient.SSEClient(response)
+
+
     def run(self):
         try:
             wiki = cfgl.cur_conf["core"]["lang"]+"wiki"
+            client = self.get_event_stream_client()
             # Event stream
-            for event in EventSource(cfgl.cur_conf["core"]["stream_url"]):
+            for event in client.events():
                 # Filter event stream
                 if event.event == 'message':
                     try:
@@ -163,23 +178,27 @@ class Worker:
                                 stabilizer.start()
 
         except KeyboardInterrupt:
-            logger.info("terminating stabilizer...")
+            LOG.info("terminating stabilizer...")
             self.killer.kill = True
             self.cf_updater.join()
+            sys.exit(0)
+
         except ConnectionResetError:
             if self.tries == 5:
-                logger.error("giving up")
+                LOG.error("giving up")
                 self.killer.kill = True
                 self.cf_updater.join()
                 sys.exit(1)
-            logger.error("error: connection error\n trying to reconnect...")
+            LOG.error("error: connection error\n trying to reconnect...")
             self.tries += 1
             self.run()
+
         except:
-            logger.error("error: faced unexcepted error check crash report")
-            logger.critical(traceback.format_exc())
-            logger.info("terminating threads")
+            LOG.error("error: faced unexcepted error check crash report")
+            LOG.critical(traceback.format_exc())
+            LOG.info("terminating threads")
             self.killer.kill = True
             self.cf_updater.join()
-            logger.info("threads terminated")
-            sys.exit(1)
+            LOG.info("threads terminated")
+
+        sys.exit(1)

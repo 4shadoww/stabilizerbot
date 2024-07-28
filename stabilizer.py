@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 # Import python modules
-import os
 import sys
 import logging
 
