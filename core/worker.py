@@ -56,30 +56,36 @@ class ConfigUpdate(threading.Thread):
         super(ConfigUpdate, self).__init__()
 
     def run(self):
-        if cfgl.cur_conf["core"]["config_mode"] == "online":
-            LOG.info("online config mode enabled")
-        else:
-            LOG.info("local config mode enabled")
+        try:
+            if cfgl.cur_conf["core"]["config_mode"] == "online":
+                LOG.info("online config mode enabled")
+            else:
+                LOG.info("local config mode enabled")
 
-        uf = 30
-        times = uf
-        while True:
-            if self.killer.kill:
-                LOG.info('ConfigUpdate: thread terminated')
-                return
-            if times >= uf:
-                times = 0
-                if cfgl.cur_conf["core"]["config_mode"] == "online":
-                    cfgl.check_for_online_update()
-                else:
-                    cfgl.check_for_local_update()
+            uf = 30
+            times = uf
+            while True:
+                if self.killer.kill:
+                    LOG.info('ConfigUpdate: thread terminated')
+                    return
+                if times >= uf:
+                    times = 0
+                    if cfgl.cur_conf["core"]["config_mode"] == "online":
+                        cfgl.check_for_online_update()
+                    else:
+                        cfgl.check_for_local_update()
 
-            if self.killer.kill:
-                LOG.info('ConfigUpdate: thread terminated')
-                return
+                if self.killer.kill:
+                    LOG.info('ConfigUpdate: thread terminated')
+                    return
 
-            time.sleep(0.5)
-            times += 0.5
+                time.sleep(0.5)
+                times += 0.5
+        except:
+            # Don't crash the thread
+            LOG.error("error: faced unexcepted error check crash report")
+            LOG.critical(traceback.format_exc())
+
 
 class Stabilizer(threading.Thread):
 
