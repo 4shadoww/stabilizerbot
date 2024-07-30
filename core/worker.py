@@ -185,6 +185,7 @@ class Worker:
                     # Last checks
                     lock.acquire()
                     if cfgl.cur_conf['core']['test'] or not expiry or change['title'] in pending:
+                        lock.release()
                         continue
 
                     # Stabilize
