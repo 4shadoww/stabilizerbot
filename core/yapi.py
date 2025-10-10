@@ -45,8 +45,14 @@ def get_score(revid):
         damaging = requests.post(LIFTWING_DAMAGING_URL, headers=headers, data=json.dumps(data))
         goodfaith = requests.post(LIFTWING_GOODFAITH_URL, headers=headers, data=json.dumps(data))
 
-        damaging_data = json.loads(damaging.text)[cur_conf['core']['lang']+'wiki']['scores'][str(revid)]['damaging']['score']
-        goodfaith_data = json.loads(goodfaith.text)[cur_conf['core']['lang']+'wiki']['scores'][str(revid)]['goodfaith']['score']
+        try:
+            damaging_data = json.loads(damaging.text)[cur_conf['core']['lang']+'wiki']['scores'][str(revid)]['damaging']['score']
+            goodfaith_data = json.loads(goodfaith.text)[cur_conf['core']['lang']+'wiki']['scores'][str(revid)]['goodfaith']['score']
+        except Exception as e:
+            logger.error("invalid response from liftwing: damaging\n" + str(damaging.status_code) + " \n" + damaging.text  \
+                + "\ngoodfaith\n" + str(goodfaith.status_code) + " \n" + goodfaith.text)
+            raise e
+
         return {'damaging': damaging_data, 'goodfaith': goodfaith_data}
     except AttributeError:
         return False
